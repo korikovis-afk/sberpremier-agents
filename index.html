@@ -161,6 +161,40 @@ details summary{cursor:pointer;font-size:12px;font-weight:600;color:#1A6FD4;padd
 .chat-send:hover{background:var(--gd)}
 .chat-send svg{width:16px;height:16px;fill:#fff}
 .chat-send:disabled{background:var(--t3);cursor:not-allowed}
+/* МАСТЕР AI-ПЛАНА */
+.plan-wizard{background:var(--surf);border-radius:var(--r);padding:0;width:520px;max-width:95vw;max-height:92vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.22);display:flex;flex-direction:column}
+.pw-header{padding:20px 24px 0;flex-shrink:0}
+.pw-title{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;color:var(--t1)}
+.pw-sub{font-size:11px;color:var(--t3);margin-top:4px}
+.pw-steps{display:flex;gap:0;margin-top:16px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
+.pw-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative}
+.pw-step:not(:last-child)::after{content:'';position:absolute;top:11px;left:calc(50% + 11px);right:calc(-50% + 11px);height:1px;background:var(--brd2)}
+.pw-step.done::after{background:var(--g)}
+.pw-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--brd2);background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--t3);z-index:1}
+.pw-step.active .pw-dot{border-color:var(--g);background:var(--g);color:#fff}
+.pw-step.done .pw-dot{border-color:var(--g);background:var(--g);color:#fff}
+.pw-step-lbl{font-size:9px;color:var(--t3);font-weight:600;text-align:center}
+.pw-step.active .pw-step-lbl{color:var(--gd)}
+.pw-body{flex:1;overflow-y:auto;padding:20px 24px}
+.pw-foot{padding:14px 24px;border-top:1px solid var(--brd);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;background:var(--surf)}
+/* чип-выбор для тем и типов */
+.chip-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{padding:5px 12px;border-radius:20px;border:1.5px solid var(--brd2);background:var(--surf2);font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;transition:all .12s;user-select:none}
+.chip:hover{border-color:var(--g);color:var(--gd)}
+.chip.sel{border-color:var(--g);background:var(--gl);color:var(--gd)}
+.pw-field{margin-bottom:16px}
+.pw-field label{font-size:11px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px}
+.pw-field input,.pw-field select,.pw-field textarea{width:100%}
+.pw-row{display:flex;gap:10px}
+.pw-row>div{flex:1}
+.pw-summary{background:var(--gl);border:1px solid var(--gm);border-radius:var(--rs);padding:14px 16px;font-size:12px;line-height:1.7}
+.pw-summary-row{display:flex;gap:8px;margin-bottom:4px}
+.pw-summary-lbl{color:var(--t3);font-size:11px;min-width:90px;flex-shrink:0}
+.pw-summary-val{color:var(--t1);font-weight:600;font-size:11px}
+.pw-gen-progress{text-align:center;padding:28px 0}
+.pw-gen-spinner{width:40px;height:40px;border:3px solid var(--brd2);border-top-color:var(--g);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+.pw-gen-txt{font-size:13px;font-weight:600;color:var(--t2)}
+.pw-gen-sub{font-size:11px;color:var(--t3);margin-top:4px}
 </style>
 </head>
 <body>
@@ -259,7 +293,7 @@ details summary{cursor:pointer;font-size:12px;font-weight:600;color:#1A6FD4;padd
         <button class="btn btn-xs plan-tab-btn" id="ptab-calendar" onclick="switchPlanTab('calendar')" style="border:none;border-radius:5px">📅 Календарь</button>
       </div>
       <button class="btn btn-g btn-xs" onclick="showModal()">+ Задача</button>
-      <button class="btn btn-s btn-xs" onclick="genPlan()">✦ AI-план</button>
+      <button class="btn btn-s btn-xs" onclick="showPlanWizard()">✦ AI-план</button>
       <button class="btn btn-p btn-xs" id="runAllBtn" onclick="runAll()" style="margin-left:auto">▶ Выполнить все</button>
     </div>
   </div>
@@ -378,6 +412,25 @@ details summary{cursor:pointer;font-size:12px;font-weight:600;color:#1A6FD4;padd
 
 </div></div></div>
 
+<!-- МАСТЕР AI-ПЛАНА -->
+<div class="overlay" id="planWizardOverlay">
+  <div class="plan-wizard" id="planWizard">
+    <div class="pw-header">
+      <div class="pw-title">✦ AI-план контента</div>
+      <div class="pw-sub">Настрой параметры — AI сгенерирует готовый план</div>
+      <div class="pw-steps">
+        <div class="pw-step active" id="pws-1"><div class="pw-dot">1</div><div class="pw-step-lbl">Период</div></div>
+        <div class="pw-step" id="pws-2"><div class="pw-dot">2</div><div class="pw-step-lbl">Темы</div></div>
+        <div class="pw-step" id="pws-3"><div class="pw-dot">3</div><div class="pw-step-lbl">Форматы</div></div>
+        <div class="pw-step" id="pws-4"><div class="pw-dot">4</div><div class="pw-step-lbl">Итог</div></div>
+      </div>
+    </div>
+    <div class="pw-body" id="pwBody"></div>
+    <div class="pw-foot" id="pwFoot"></div>
+  </div>
+</div>
+
+<!-- МОДАЛ НОВОЙ ЗАДАЧИ -->
 <div class="overlay" id="addModal">
   <div class="modal">
     <div class="m-title">Новая задача</div>
@@ -416,6 +469,214 @@ var CM={tg:'TG',sms:'SMS',push:'Push',site:'Сайт'};
 var TM={post:'Пост',sms:'SMS/Push',article:'Статья',banner:'Баннер'};
 var S={apiKey:'',kb:{files:[],snippets:[],manual:'',examples:''},plan:[],nid:1,running:false,results:[]};
 var chatHistory=[];
+
+// ========== МАСТЕР AI-ПЛАНА ==========
+var WZ={step:1,dateFrom:'',dateTo:'',topics:[],types:[],channels:[],freq:'3',extraNotes:''};
+
+var TOPIC_CHIPS=[
+  {v:'family',l:'👨‍👩‍👧 Семья и дети'},
+  {v:'privileges',l:'⭐ Привилегии'},
+  {v:'investments',l:'📈 Инвестиции'},
+  {v:'travel',l:'✈️ Путешествия'},
+  {v:'cashback',l:'💳 Кешбэк'},
+  {v:'insurance',l:'🛡️ Страхование'},
+  {v:'realty',l:'🏠 Недвижимость'},
+  {v:'health',l:'❤️ Здоровье'},
+  {v:'education',l:'📚 Образование'},
+  {v:'lifestyle',l:'🌟 Стиль жизни'},
+];
+var TYPE_CHIPS=[
+  {v:'post',l:'📝 Пост TG'},
+  {v:'sms',l:'📱 SMS/Push'},
+  {v:'article',l:'📄 Статья'},
+  {v:'banner',l:'🖼 Баннер'},
+];
+var CHAN_CHIPS=[
+  {v:'tg',l:'Telegram'},
+  {v:'sms',l:'SMS'},
+  {v:'push',l:'Push'},
+  {v:'site',l:'Сайт'},
+];
+
+function showPlanWizard(){
+  WZ={step:1,dateFrom:toDay(),dateTo:'',topics:[],types:['post'],channels:['tg'],freq:'3',extraNotes:''};
+  // Установить dateTo = через 14 дней
+  var dt=new Date();dt.setDate(dt.getDate()+14);
+  WZ.dateTo=dt.toISOString().slice(0,10);
+  document.getElementById('planWizardOverlay').style.display='flex';
+  renderWizard();
+}
+function hideWizard(){document.getElementById('planWizardOverlay').style.display='none';}
+
+function renderWizard(){
+  // Обновить шаги
+  for(var i=1;i<=4;i++){
+    var el=document.getElementById('pws-'+i);
+    el.className='pw-step'+(i===WZ.step?' active':i<WZ.step?' done':'');
+    el.querySelector('.pw-dot').textContent=i<WZ.step?'✓':i;
+  }
+  var body=document.getElementById('pwBody');
+  var foot=document.getElementById('pwFoot');
+
+  if(WZ.step===1){
+    body.innerHTML=
+      '<div class="pw-field"><label>📅 Начало периода</label>'
+      +'<input type="date" id="wz-from" value="'+WZ.dateFrom+'"></div>'
+      +'<div class="pw-field"><label>📅 Конец периода</label>'
+      +'<input type="date" id="wz-to" value="'+WZ.dateTo+'"></div>'
+      +'<div class="pw-field"><label>🔄 Периодичность публикаций</label>'
+      +'<div class="chip-group" id="wz-freq">'
+      +'<div class="chip'+(WZ.freq==='1'?' sel':'')+'" onclick="selFreq(\'1\')">Ежедневно</div>'
+      +'<div class="chip'+(WZ.freq==='2'?' sel':'')+'" onclick="selFreq(\'2\')">Через день</div>'
+      +'<div class="chip'+(WZ.freq==='3'?' sel':'')+'" onclick="selFreq(\'3\')">3 раза в неделю</div>'
+      +'<div class="chip'+(WZ.freq==='5'?' sel':'')+'" onclick="selFreq(\'5\')">Раз в неделю</div>'
+      +'</div></div>';
+    foot.innerHTML='<button class="btn btn-g" onclick="hideWizard()">Отмена</button>'
+      +'<button class="btn btn-p" onclick="wzNext()">Далее →</button>';
+  }
+  else if(WZ.step===2){
+    var chips=TOPIC_CHIPS.map(function(c){
+      return '<div class="chip'+(WZ.topics.indexOf(c.v)>=0?' sel':'')+'" onclick="toggleChip(\'topics\',\''+c.v+'\')">'+c.l+'</div>';
+    }).join('');
+    body.innerHTML=
+      '<div class="pw-field"><label>🎯 Темы контента <span style="color:var(--t3);font-weight:400">(выбери одну или несколько)</span></label>'
+      +'<div class="chip-group">'+chips+'</div></div>'
+      +'<div class="pw-field" style="margin-top:8px"><label>✏️ Дополнительные темы или акценты</label>'
+      +'<textarea id="wz-notes" rows="3" placeholder="Например: акцент на совместный счёт, ипотечные каникулы, новая коллекция карт...">'+WZ.extraNotes+'</textarea></div>';
+    foot.innerHTML='<button class="btn btn-g" onclick="wzPrev()">← Назад</button>'
+      +'<button class="btn btn-p" onclick="wzNext()">Далее →</button>';
+  }
+  else if(WZ.step===3){
+    var tChips=TYPE_CHIPS.map(function(c){
+      return '<div class="chip'+(WZ.types.indexOf(c.v)>=0?' sel':'')+'" onclick="toggleChip(\'types\',\''+c.v+'\')">'+c.l+'</div>';
+    }).join('');
+    var cChips=CHAN_CHIPS.map(function(c){
+      return '<div class="chip'+(WZ.channels.indexOf(c.v)>=0?' sel':'')+'" onclick="toggleChip(\'channels\',\''+c.v+'\')">'+c.l+'</div>';
+    }).join('');
+    body.innerHTML=
+      '<div class="pw-field"><label>📋 Форматы контента</label>'
+      +'<div class="chip-group">'+tChips+'</div></div>'
+      +'<div class="pw-field" style="margin-top:16px"><label>📡 Каналы публикации</label>'
+      +'<div class="chip-group">'+cChips+'</div></div>';
+    foot.innerHTML='<button class="btn btn-g" onclick="wzPrev()">← Назад</button>'
+      +'<button class="btn btn-p" onclick="wzNext()">Далее →</button>';
+  }
+  else if(WZ.step===4){
+    // Посчитать примерное кол-во постов
+    var d1=new Date(WZ.dateFrom+'T00:00:00'),d2=new Date(WZ.dateTo+'T00:00:00');
+    var days=Math.max(1,Math.round((d2-d1)/(1000*60*60*24)));
+    var freqMap={'1':7,'2':3.5,'3':3,'5':1};
+    var postsPerWeek=freqMap[WZ.freq]||3;
+    var total=Math.max(1,Math.round(days/7*postsPerWeek));
+    total=Math.min(total,20);
+
+    var freqLabels={'1':'Ежедневно','2':'Через день','3':'3 раза в неделю','5':'Раз в неделю'};
+    var topicLabels=WZ.topics.map(function(t){return TOPIC_CHIPS.find(function(c){return c.v===t;});}).filter(Boolean).map(function(c){return c.l;}).join(', ')||'Без ограничений';
+    var typeLabels=WZ.types.map(function(t){return TYPE_CHIPS.find(function(c){return c.v===t;});}).filter(Boolean).map(function(c){return c.l;}).join(', ')||'Все форматы';
+    var chanLabels=WZ.channels.map(function(t){return CHAN_CHIPS.find(function(c){return c.v===t;});}).filter(Boolean).map(function(c){return c.l;}).join(', ')||'Все каналы';
+
+    body.innerHTML=
+      '<div style="margin-bottom:14px;font-size:12px;color:var(--t2)">Всё готово! AI сгенерирует примерно <strong style="color:var(--gd)">'+total+' задач</strong>.</div>'
+      +'<div class="pw-summary">'
+      +'<div class="pw-summary-row"><span class="pw-summary-lbl">Период</span><span class="pw-summary-val">'+fmtD(WZ.dateFrom)+' — '+fmtD(WZ.dateTo)+'</span></div>'
+      +'<div class="pw-summary-row"><span class="pw-summary-lbl">Периодичность</span><span class="pw-summary-val">'+(freqLabels[WZ.freq]||WZ.freq)+'</span></div>'
+      +'<div class="pw-summary-row"><span class="pw-summary-lbl">Темы</span><span class="pw-summary-val">'+topicLabels+'</span></div>'
+      +'<div class="pw-summary-row"><span class="pw-summary-lbl">Форматы</span><span class="pw-summary-val">'+typeLabels+'</span></div>'
+      +'<div class="pw-summary-row"><span class="pw-summary-lbl">Каналы</span><span class="pw-summary-val">'+chanLabels+'</span></div>'
+      +(WZ.extraNotes?'<div class="pw-summary-row"><span class="pw-summary-lbl">Акценты</span><span class="pw-summary-val">'+esc(WZ.extraNotes.slice(0,80))+'</span></div>':'')
+      +'</div>';
+    foot.innerHTML='<button class="btn btn-g" onclick="wzPrev()">← Назад</button>'
+      +'<button class="btn btn-p" onclick="wzGenerate()">✦ Сгенерировать план</button>';
+  }
+}
+
+function selFreq(v){
+  WZ.freq=v;
+  document.querySelectorAll('#wz-freq .chip').forEach(function(c){c.classList.remove('sel');});
+  event.target.classList.add('sel');
+}
+function toggleChip(field,val){
+  var arr=WZ[field];
+  var idx=arr.indexOf(val);
+  if(idx>=0)arr.splice(idx,1);
+  else arr.push(val);
+  renderWizard();
+}
+
+function wzSaveStep(){
+  if(WZ.step===1){
+    var f=document.getElementById('wz-from'),t=document.getElementById('wz-to');
+    if(f)WZ.dateFrom=f.value;
+    if(t)WZ.dateTo=t.value;
+    if(!WZ.dateFrom||!WZ.dateTo){alert('Укажи обе даты');return false;}
+    if(WZ.dateTo<WZ.dateFrom){alert('Дата окончания должна быть позже начала');return false;}
+  }
+  if(WZ.step===2){
+    var n=document.getElementById('wz-notes');
+    if(n)WZ.extraNotes=n.value.trim();
+  }
+  if(WZ.step===3){
+    if(!WZ.types.length){alert('Выбери хотя бы один формат');return false;}
+    if(!WZ.channels.length){alert('Выбери хотя бы один канал');return false;}
+  }
+  return true;
+}
+function wzNext(){if(wzSaveStep()){WZ.step++;renderWizard();}}
+function wzPrev(){WZ.step--;renderWizard();}
+
+async function wzGenerate(){
+  if(!S.apiKey){alert('Введи API ключ в верхней панели');return;}
+  // Показать прогресс
+  document.getElementById('pwBody').innerHTML=
+    '<div class="pw-gen-progress">'
+    +'<div class="pw-gen-spinner"></div>'
+    +'<div class="pw-gen-txt">AI генерирует контент-план...</div>'
+    +'<div class="pw-gen-sub">Это займёт несколько секунд</div>'
+    +'</div>';
+  document.getElementById('pwFoot').innerHTML='';
+
+  // Посчитать даты по периодичности
+  var d1=new Date(WZ.dateFrom+'T00:00:00'),d2=new Date(WZ.dateTo+'T00:00:00');
+  var days=Math.max(1,Math.round((d2-d1)/(1000*60*60*24)));
+  var freqMap={'1':1,'2':2,'3':Math.ceil(7/3),'5':7};
+  var step=freqMap[WZ.freq]||2;
+  var dates=[];
+  var cur=new Date(d1);
+  while(cur<=d2&&dates.length<20){
+    dates.push(cur.toISOString().slice(0,10));
+    cur.setDate(cur.getDate()+step);
+  }
+
+  var topicLabels=WZ.topics.map(function(t){return TOPIC_CHIPS.find(function(c){return c.v===t;});}).filter(Boolean).map(function(c){return c.l.replace(/[^\w\sа-яё]/gi,'').trim();}).join(', ')||'семейные привилегии СберПремьер';
+  var typeLabels=WZ.types.join('|');
+  var chanStr=JSON.stringify(WZ.channels.length?WZ.channels:['tg']);
+
+  var sys='Ты контент-стратег Telegram-канала СберПремьер. Отвечай ТОЛЬКО валидным JSON-массивом без markdown и без пояснений.\nФормат каждого объекта: {"date":"YYYY-MM-DD","topic":"...","type":"'+typeLabels+'","channels":'+chanStr+'}\ntype выбирай из: '+typeLabels+'\nchannels всегда: '+chanStr;
+
+  var prompt='Сгенерируй контент-план для СберПремьер.\n'
+    +'Даты публикаций: '+dates.join(', ')+'.\n'
+    +'Тематики: '+topicLabels+'.\n'
+    +(WZ.extraNotes?'Дополнительные акценты: '+WZ.extraNotes+'.\n':'')
+    +'Количество задач: '+dates.length+'.\n'
+    +'Темы должны быть разнообразными, конкретными и релевантными СберПремьер. Не повторяй темы.';
+
+  try{
+    var res=await callAI(sys,withKb(prompt));
+    var items=JSON.parse(res.replace(/```json|```/g,'').trim());
+    var added=0;
+    items.forEach(function(it){
+      S.plan.push({id:S.nid++,date:it.date,topic:it.topic,type:it.type||WZ.types[0]||'post',channels:it.channels||WZ.channels||['tg'],notes:'',status:'todo',result:null});
+      added++;
+    });
+    renderPlan();updBadge();dot('plan','done');
+    hideWizard();
+    document.getElementById('execWrap').style.display='block';
+    elog('✦ AI-план создан: '+added+' задач за период '+fmtD(WZ.dateFrom)+' — '+fmtD(WZ.dateTo),'lm-g');
+  }catch(e){
+    document.getElementById('pwBody').innerHTML='<div style="text-align:center;padding:24px;color:var(--red)">Ошибка: '+esc(e.message)+'</div>';
+    document.getElementById('pwFoot').innerHTML='<button class="btn btn-g" onclick="hideWizard()">Закрыть</button><button class="btn btn-p" onclick="wzGenerate()">Повторить</button>';
+  }
+}
 
 function goPage(id,el){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
@@ -605,20 +866,6 @@ function updBadge(){
   var na=document.getElementById('nb-appr');if(na){na.textContent=rev;na.style.display=rev?'inline':'none';}
 }
 function setSt(id,s){var r=S.plan.find(function(r){return r.id===id;});if(r){r.status=s;renderPlan();updBadge();}}
-async function genPlan(){
-  dot('plan','busy');
-  var sys='Ты контент-стратег СберПремьер. Отвечай ТОЛЬКО валидным JSON-массивом без markdown. Формат: [{"date":"YYYY-MM-DD","topic":"...","type":"post|sms|article|banner","channels":["tg","sms","push","site"]}]';
-  var today=new Date(),dates=[];
-  for(var i=1;i<=10;i++){var d=new Date(today);d.setDate(d.getDate()+i);dates.push(d.toISOString().slice(0,10));}
-  elog('AI генерирует контент-план...','lm-o');
-  document.getElementById('execWrap').style.display='block';
-  try{
-    var res=await callAI(sys,withKb('Контент-план для СберПремьер (семейные привилегии). Даты: '+dates.join(', ')+'. 10 задач.'));
-    var items=JSON.parse(res.replace(/```json|```/g,'').trim());
-    items.forEach(function(it){S.plan.push({id:S.nid++,date:it.date,topic:it.topic,type:it.type||'post',channels:it.channels||['tg'],notes:'',status:'todo',result:null});});
-    renderPlan();updBadge();dot('plan','done');elog('Создано '+items.length+' задач','lm-g');
-  }catch(e){elog('Ошибка: '+e.message,'lm-r');dot('plan','warn');}
-}
 async function runAll(){
   var pending=S.plan.filter(function(r){return r.status==='todo';});
   if(!pending.length){alert('Нет задач для выполнения');return;}
