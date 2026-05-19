@@ -182,6 +182,8 @@ details summary{cursor:pointer;font-size:12px;font-weight:600;color:#1A6FD4;padd
 .topic-type-table td{padding:7px 10px;border-bottom:1px solid var(--brd);font-size:12px;vertical-align:middle}
 .topic-type-table tr:last-child td{border-bottom:none}
 .topic-type-table select{padding:4px 8px;font-size:11px;width:150px}
+.streaming-cursor{display:inline-block;width:2px;height:1em;background:var(--g);animation:blink .7s infinite;vertical-align:text-bottom;margin-left:2px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 </style>
 </head>
 <body>
@@ -429,12 +431,21 @@ details summary{cursor:pointer;font-size:12px;font-weight:600;color:#1A6FD4;padd
 </div>
 
 <script>
+// ===== КОНСТАНТЫ =====
 var API='https://api.anthropic.com/v1/messages';
-var MDL='claude-sonnet-4-5';
+// [1] Обновлена модель до актуальной claude-sonnet-4-20250514
+var MDL='claude-sonnet-4-20250514';
 var CM={tg:'TG',sms:'SMS',push:'Push',site:'Сайт'};
 var TM={post:'Пост',sms:'SMS/Push',article:'Статья',banner:'Баннер',research:'Исследование'};
 var S={apiKey:'',kb:{files:[],snippets:[],manual:'',examples:''},plan:[],nid:1,running:false,results:[]};
 var chatHistory=[];
+
+// [5] База знаний о продуктах СберПремьер для кнопок быстрой загрузки
+var SBER_KNOWLEDGE={
+  'https://www.sberbank.ru/ru/person/premier': 'СберПремьер — премиальный пакет услуг Сбербанка для состоятельных клиентов. Включает: персонального менеджера, приоритетное обслуживание в отдельных зонах отделений, бесплатное обслуживание дебетовой карты Visa Signature/Mastercard World Elite, повышенный кешбэк до 10% бонусами СберСпасибо, доступ к инвестиционным продуктам, страхование, привилегии для всей семьи. Минимальный остаток от 2,5 млн руб. или ежемесячные поступления от 150 000 руб. ЦА: предприниматели, топ-менеджеры, специалисты с высоким доходом 35-60 лет. УТП: единое пространство для управления финансами семьи, привилегии партнёров, персональный сервис 24/7.',
+  'https://www.sberbank.ru/ru/person/premier/family': 'СберПремьер Семья — программа привилегий для близких держателя карты СберПремьер. До 5 членов семьи получают: бесплатные карты с привилегиями, персональный менеджер, повышенный кешбэк. Совместный счёт — управление финансами семьи в одном месте. Детские карты с контролем расходов. Накопительный счёт «Семейный». Страхование всей семьи. Специальные условия ипотеки для семей с детьми.',
+  'https://www.sberbank.ru/ru/person/premier/privileges': 'Привилегии СберПремьер: доступ в бизнес-залы аэропортов по карте Priority Pass (более 1300 залов по миру), страховка для путешественников, бесплатные переводы и конвертация валюты по выгодному курсу, кешбэк до 10% в ресторанах и travel-категориях, скидки у партнёров (отели, рестораны, медицина, образование), приглашения на закрытые мероприятия, персональный консьерж-сервис.'
+};
 
 // ===== localStorage =====
 var LS='sberpremier_v4';
@@ -462,7 +473,40 @@ function renderFiles(){document.getElementById('fileList').innerHTML=S.kb.files.
 function renderSnippets(){var sl=document.getElementById('snippetList');if(!sl)return;sl.innerHTML=S.kb.snippets.map(function(s,i){return '<div class="ks"><div class="ks-src">🌐 '+s.url+' <span class="fi-d" onclick="delSnip('+i+')" style="float:right">✕</span></div><div class="ks-txt">'+esc(s.text.slice(0,200))+'...</div></div>';}).join('');}
 function delFile(i){S.kb.files.splice(i,1);renderFiles();updateKb();autoSave();}
 function qUrl(u){document.getElementById('urlInp').value=u;addUrl();}
-function addUrl(){var inp=document.getElementById('urlInp'),url=inp.value.trim();if(!url)return;inp.value='';var el=document.createElement('div');el.className='ks';el.innerHTML='<div class="ks-src">🌐 '+url+' <span style="color:var(--gold)">· загружаю...</span></div><div class="ks-txt" style="color:var(--t3);font-style:italic">Изучаю страницу...</div>';document.getElementById('snippetList').prepend(el);callAI('Ты аналитик СберПремьер. Резюме: привилегии, условия, ЦА, УТП. 5-7 предложений.','Страница: '+url+'\nОпиши услуги СберПремьер.').then(function(res){S.kb.snippets.push({url:url,text:res});el.querySelector('.ks-src').innerHTML='🌐 '+url;el.querySelector('.ks-txt').textContent=res;el.querySelector('.ks-txt').style='';updateKb();autoSave();}).catch(function(e){el.querySelector('.ks-txt').textContent='Ошибка: '+e.message;});}
+
+// [5] addUrl теперь использует встроенную базу знаний о продуктах Сбера
+// если URL совпадает — берём готовый текст, иначе просим AI описать по URL
+function addUrl(){
+  var inp=document.getElementById('urlInp'),url=inp.value.trim();if(!url)return;inp.value='';
+  if(S.kb.snippets.find(function(s){return s.url===url;}))return;
+  var el=document.createElement('div');el.className='ks';
+  el.innerHTML='<div class="ks-src">🌐 '+url+' <span style="color:var(--gold)">· загружаю...</span></div><div class="ks-txt" style="color:var(--t3);font-style:italic">Изучаю страницу...</div>';
+  document.getElementById('snippetList').prepend(el);
+
+  // Проверяем встроенную базу знаний
+  var knownText=SBER_KNOWLEDGE[url];
+  if(knownText){
+    S.kb.snippets.push({url:url,text:knownText});
+    el.querySelector('.ks-src').innerHTML='🌐 '+url;
+    el.querySelector('.ks-txt').textContent=knownText;
+    el.querySelector('.ks-txt').style='';
+    updateKb();autoSave();
+    return;
+  }
+
+  // Для неизвестных URL — AI генерирует описание на основе URL
+  callAI(
+    'Ты аналитик СберПремьер. По URL угадай и опиши раздел: продукты, привилегии, условия, ЦА, УТП. 5-7 предложений. Если URL не распознан — напиши общее описание СберПремьер.',
+    'URL страницы: '+url+'\nОпиши предположительное содержание и услуги.'
+  ).then(function(res){
+    S.kb.snippets.push({url:url,text:res});
+    el.querySelector('.ks-src').innerHTML='🌐 '+url;
+    el.querySelector('.ks-txt').textContent=res;
+    el.querySelector('.ks-txt').style='';
+    updateKb();autoSave();
+  }).catch(function(e){el.querySelector('.ks-txt').textContent='Ошибка: '+e.message;});
+}
+
 function saveMan(){var t=document.getElementById('manInp').value.trim();if(!t)return;S.kb.manual=t;document.getElementById('manSt').textContent='✓ Сохранено';updateKb();autoSave();}
 function clearMan(){document.getElementById('manInp').value='';S.kb.manual='';document.getElementById('manSt').textContent='';updateKb();autoSave();}
 function saveExamples(){var t=document.getElementById('examplesInp').value.trim();if(!t)return;S.kb.examples=t;document.getElementById('exSt').textContent='✓ Сохранено';updateKb();autoSave();}
@@ -487,19 +531,22 @@ function withKb(msg){var kb=kbCtx();if(!kb)return msg;return '=== БАЗА ЗН�
 function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
 function clearChat(){chatHistory=[];document.getElementById('chatMsgs').innerHTML='<div class="chat-msg agent"><div class="chat-ava">🧭</div><div class="chat-bubble">Чат очищен!</div></div>';}
 function addChatMsg(role,text,thinking){var el=document.getElementById('chatMsgs');var div=document.createElement('div');div.className='chat-msg '+(role==='user'?'user':'agent');div.innerHTML=(role==='user'?'<div class="chat-ava">Вы</div>':'<div class="chat-ava">🧭</div>')+'<div class="chat-bubble'+(thinking?' thinking':'')+'">'+esc(text)+'</div>';el.appendChild(div);el.scrollTop=el.scrollHeight;return div;}
+
+// [2] Чат использует стриминг
 async function sendChat(){
   var inp=document.getElementById('chatInp');var msg=inp.value.trim();if(!msg||!S.apiKey)return;inp.value='';
   document.getElementById('chatSendBtn').disabled=true;addChatMsg('user',msg);chatHistory.push({role:'user',content:msg});
-  var thinkDiv=addChatMsg('agent','Думаю...',true);
+  var el=document.getElementById('chatMsgs');
+  var div=document.createElement('div');div.className='chat-msg agent';
+  div.innerHTML='<div class="chat-ava">🧭</div><div class="chat-bubble"></div>';
+  el.appendChild(div);el.scrollTop=el.scrollHeight;
+  var bubble=div.querySelector('.chat-bubble');
   var planCtx=S.plan.length?'\n\nКОНТЕНТ-ПЛАН:\n'+S.plan.map(function(r){return '• ['+r.status+'] '+r.topic+' ('+fmtD(r.date)+')'+(r.result?'\n  '+r.result.copy.slice(0,150)+'...':'');}).join('\n'):'';
   var SM='Ты — контент-менеджер СберПремьер. Команда: Исследователь, Аналитик, Копирайтер, Визуалист, Факт-чекер, Редактор.\nПринимаешь критику, объясняешь, предлагаешь решения. Стиль: деловой, без отговорок.'+(kbCtx()?'\n\nБАЗА ЗНАНИЙ:\n'+kbCtx():'')+planCtx;
   try{
-    var r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:MDL,max_tokens:1500,system:SM,messages:chatHistory})});
-    if(!r.ok){var t=await r.text();throw new Error('HTTP '+r.status);}
-    var d=await r.json();if(d.error)throw new Error(d.error.message);
-    var reply=(d.content&&d.content[0]&&d.content[0].text)?d.content[0].text:'';
-    chatHistory.push({role:'assistant',content:reply});thinkDiv.querySelector('.chat-bubble').className='chat-bubble';thinkDiv.querySelector('.chat-bubble').textContent=reply;document.getElementById('chatMsgs').scrollTop=document.getElementById('chatMsgs').scrollHeight;mlog('Диалог: «'+msg.slice(0,60)+'»');
-  }catch(e){thinkDiv.querySelector('.chat-bubble').textContent='Ошибка: '+e.message;thinkDiv.querySelector('.chat-bubble').style.color='var(--red)';}
+    var reply=await callAIStream(SM,chatHistory,function(chunk){bubble.textContent+=chunk;el.scrollTop=el.scrollHeight;});
+    chatHistory.push({role:'assistant',content:reply});mlog('Диалог: «'+msg.slice(0,60)+'»');
+  }catch(e){bubble.textContent='Ошибка: '+e.message;bubble.style.color='var(--red)';}
   document.getElementById('chatSendBtn').disabled=false;
 }
 
@@ -588,8 +635,46 @@ async function wzGenerate(){
   }catch(e){document.getElementById('pwBody').innerHTML='<div style="text-align:center;padding:24px;color:var(--red)">Ошибка: '+esc(e.message)+'</div>';document.getElementById('pwFoot').innerHTML='<button class="btn btn-g" onclick="hideWizard()">Закрыть</button><button class="btn btn-p" onclick="wzGenerate()">Повторить</button>';}
 }
 
+// ===== [3] ДИНАМИЧЕСКИЕ ПРОМПТЫ КОПИРАЙТЕРА =====
+function buildCopywriterPrompt(channels, type) {
+  var channelRules = [];
+  if(channels.indexOf('tg') >= 0) {
+    if(type === 'research') channelRules.push('TELEGRAM (исследование): 400-600 символов, структура с цифрами и выводами, заголовок + 3-4 абзаца');
+    else channelRules.push('TELEGRAM: 150-300 символов, зачин + 2-3 выгоды с эмодзи + CTA, живой тон');
+  }
+  if(channels.indexOf('sms') >= 0) channelRules.push('SMS: строго до 160 символов, только суть + выгода + краткий CTA, без эмодзи');
+  if(channels.indexOf('push') >= 0) channelRules.push('PUSH: заголовок до 50 символов + текст до 100 символов, конкретная выгода, срочность');
+  if(channels.indexOf('site') >= 0) {
+    if(type === 'article') channelRules.push('СТАТЬЯ НА САЙТ: 600-900 символов, H1-заголовок + введение + 3 раздела + итог + CTA, SEO-дружелюбно');
+    else if(type === 'banner') channelRules.push('ТЕКСТ ДЛЯ БАННЕРА: заголовок 4-7 слов + подзаголовок 1 строка + кнопка 2-4 слова');
+    else channelRules.push('ВЕБ-СТРАНИЦА: 300-500 символов, структура с выгодами, кнопка CTA');
+  }
+  var sep = channels.length > 1 ? 'Несколько каналов — разделяй блоки «--- [КАНАЛ] ---».' : '';
+  return 'Ты — Копирайтер СберПремьер. Используй данные от Исследователя и Аналитика.\n'
+    + 'КАНАЛЫ ДЛЯ ТЕКУЩЕЙ ЗАДАЧИ:\n' + channelRules.map(function(r){return '• '+r;}).join('\n') + '\n\n'
+    + 'ОБЩИЕ ПРАВИЛА: никаких **, ##, маркдауна. ' + sep + '\n'
+    + 'ЗАПРЕЩЕНО: % без оговорок, «гарантируем», «лучший», «уникальный».\n'
+    + 'Пиши ТОЛЬКО готовые тексты без пояснений.';
+}
+
 // ===== ЗАПУСК ЗАДАЧИ =====
-async function runAll(){var pending=S.plan.filter(function(r){return r.status==='todo';});if(!pending.length){alert('Нет задач');return;}document.getElementById('runAllBtn').disabled=true;for(var i=0;i<pending.length;i++)await runOne(pending[i].id);document.getElementById('runAllBtn').disabled=false;}
+
+// [4] runAll с задержкой между задачами чтобы избежать rate limit
+async function runAll(){
+  var pending=S.plan.filter(function(r){return r.status==='todo';});
+  if(!pending.length){alert('Нет задач');return;}
+  document.getElementById('runAllBtn').disabled=true;
+  for(var i=0;i<pending.length;i++){
+    if(i>0){
+      // Пауза 1 секунда между задачами
+      elog('⏳ Пауза перед следующей задачей...','lm-b');
+      await new Promise(function(resolve){setTimeout(resolve,1000);});
+    }
+    await runOne(pending[i].id);
+  }
+  document.getElementById('runAllBtn').disabled=false;
+}
+
 async function runOne(id){
   var row=S.plan.find(function(r){return r.id===id;});if(!row||S.running)return;
   S.running=true;document.getElementById('execWrap').style.display='block';renderPlan();
@@ -598,40 +683,83 @@ async function runOne(id){
 
   var SR='Ты — Исследователь СберПремьер.\nФОРМАТ:\n📌 КЛЮЧЕВЫЕ ФАКТЫ (3-5)\n💬 РЕАЛЬНЫЕ КЕЙСЫ\n🔍 ИНСАЙТЫ\nОтвечай конкретно.';
   var SA='Ты — Аналитик СберПремьер.\nФОРМАТ:\n📊 КЛЮЧЕВЫЕ ЦИФРЫ (3-5)\n🏆 КОНТЕКСТ\n💡 КРЮЧКИ ДЛЯ ТЕКСТА';
-  var SC='Ты — Копирайтер СберПремьер. Используй данные от Исследователя и Аналитика.\nСТРУКТУРА: 1.Зачин 2.Выгоды/примеры с эмодзи 3.Финал+CTA\nПРАВИЛА: один перенос, никаких **, ##. TG: 150-300 симв. Исследование: 400-600 с цифрами. SMS: до 160. Несколько каналов — «--- SMS ---».\nЗАПРЕЩЕНО: % без оговорок, «гарантируем», «лучший».\nПиши ТОЛЬКО текст.';
+  // [3] Промпт копирайтера строится динамически под каналы задачи
+  var SC=buildCopywriterPrompt(row.channels, row.type);
   var SV='Ты — Арт-директор СберПремьер. Стиль: #21A038, #F5A623.\nОТВЕЧАЙ СТРОГО:\nКОНЦЕПЦИЯ: [2-3 предложения]\nОПИСАНИЕ: [детально]\nПРОМПТ: [английский промпт для DALL-E/Midjourney]\nВЕРСТКА: [рекомендации]';
   var SFC='Ты — Факт-чекер СберПремьер.\nЧЕКЛИСТ:\n✅/⚠️/❌ Цифры без оговорок\n✅/⚠️/❌ Юр. рискованные обещания\n✅/⚠️/❌ Запрещённые слова\n✅/⚠️/❌ Достоверность\n✅/⚠️/❌ Соответствие продуктам Сбера\nЗАКЛЮЧЕНИЕ: ПРОШЁЛ ПРОВЕРКУ или ТРЕБУЕТ ПРАВКИ';
   var SE='Ты — Главный редактор СберПремьер.\nЧЕКЛИСТ: 1.ГРАММАТИКА 2.СТИЛЬ/TOV 3.СТРУКТУРА 4.CTA 5.КАНАЛ\nФОРМАТ: summary → чеклист (✅/⚠️/❌) → ВЕРДИКТ: ОДОБРЕНО или ТРЕБУЕТ ДОРАБОТКИ';
 
-  dot('researcher','busy');ast('researcher','as-busy','Исследует...');dot('analyst','busy');ast('analyst','as-busy','Анализирует...');setLoad('researcher');setLoad('analyst');elog('🔍 Исследователь + 📊 Аналитик...','lm-b');
+  // [2] Агенты используют стриминг — текст появляется по мере генерации
+  dot('researcher','busy');ast('researcher','as-busy','Исследует...');dot('analyst','busy');ast('analyst','as-busy','Анализирует...');
+  setStreamStart('researcher');setStreamStart('analyst');
+  elog('🔍 Исследователь + 📊 Аналитик...','lm-b');
   var researchRes='',analystRes='';
-  try{var p1=await Promise.all([callAI(SR,withKb('Исследуй:\n'+brief)),callAI(SA,withKb('Подготовь цифры:\n'+brief))]);researchRes=p1[0];analystRes=p1[1];}catch(e){elog('Ошибка: '+e.message,'lm-r');setSt(id,'error');S.running=false;return;}
-  setOut('researcher',researchRes,false);setOut('analyst',analystRes,false);dot('researcher','done');ast('researcher','as-done','Готово ✓');dot('analyst','done');ast('analyst','as-done','Готово ✓');elog('Исследователь и Аналитик завершили','lm-g');
+  try{
+    var p1=await Promise.all([
+      callAIStream(SR,[{role:'user',content:withKb('Исследуй:\n'+brief)}],function(c){appendStream('researcher',c);}),
+      callAIStream(SA,[{role:'user',content:withKb('Подготовь цифры:\n'+brief)}],function(c){appendStream('analyst',c);})
+    ]);
+    researchRes=p1[0];analystRes=p1[1];
+  }catch(e){elog('Ошибка: '+e.message,'lm-r');setSt(id,'error');S.running=false;return;}
+  finalizeStream('researcher',researchRes,false);finalizeStream('analyst',analystRes,false);
+  dot('researcher','done');ast('researcher','as-done','Готово ✓');dot('analyst','done');ast('analyst','as-done','Готово ✓');
+  elog('Исследователь и Аналитик завершили','lm-g');
 
-  dot('copy','busy');ast('copy','as-busy','Пишет...');dot('visual','busy');ast('visual','as-busy','Думает...');setLoad('copy');setLoad('visual');elog('✍️ Копирайтер + 🎨 Визуалист...','lm-o');
+  dot('copy','busy');ast('copy','as-busy','Пишет...');dot('visual','busy');ast('visual','as-busy','Думает...');
+  setStreamStart('copy');setStreamStart('visual');
+  elog('✍️ Копирайтер + 🎨 Визуалист...','lm-o');
   var copyRes='',visRes='';
-  try{var enriched=brief+'\n\nИССЛЕДОВАНИЕ:\n'+researchRes+'\n\nАНАЛИТИКА:\n'+analystRes;var p2=await Promise.all([callAI(SC,withKb('Напиши тексты:\n'+enriched)),callAI(SV,withKb('Концепция:\n'+brief))]);copyRes=p2[0];visRes=p2[1];}catch(e){elog('Ошибка: '+e.message,'lm-r');setSt(id,'error');S.running=false;return;}
-  setOut('copy',copyRes,true);setOut('visual',visRes,false);dot('copy','done');ast('copy','as-done','Готово ✓');dot('visual','done');ast('visual','as-done','Готово ✓');elog('Копирайтер и Визуалист завершили','lm-g');
+  try{
+    var enriched=brief+'\n\nИССЛЕДОВАНИЕ:\n'+researchRes+'\n\nАНАЛИТИКА:\n'+analystRes;
+    var p2=await Promise.all([
+      callAIStream(SC,[{role:'user',content:withKb('Напиши тексты:\n'+enriched)}],function(c){appendStream('copy',c);}),
+      callAIStream(SV,[{role:'user',content:withKb('Концепция:\n'+brief)}],function(c){appendStream('visual',c);})
+    ]);
+    copyRes=p2[0];visRes=p2[1];
+  }catch(e){elog('Ошибка: '+e.message,'lm-r');setSt(id,'error');S.running=false;return;}
+  finalizeStream('copy',copyRes,true);finalizeStream('visual',visRes,false);
+  dot('copy','done');ast('copy','as-done','Готово ✓');dot('visual','done');ast('visual','as-done','Готово ✓');
+  elog('Копирайтер и Визуалист завершили','lm-g');
 
-  dot('factcheck','busy');ast('factcheck','as-busy','Проверяет...');setLoad('factcheck');elog('🔎 Факт-чекер...','lm-o');
+  dot('factcheck','busy');ast('factcheck','as-busy','Проверяет...');setStreamStart('factcheck');
+  elog('🔎 Факт-чекер...','lm-o');
   var factRes='';
-  try{factRes=await callAI(SFC,withKb('Проверь:\nБРИФ:\n'+brief+'\n\nТЕКСТ:\n'+copyRes));}catch(e){factRes='Ошибка: '+e.message;}
-  setOut('factcheck',factRes,false);dot('factcheck','done');ast('factcheck','as-done','Готово ✓');elog('Факт-чекер завершил','lm-g');
-  if(factRes.toLowerCase().indexOf('требует правки')>=0){elog('Факт-чекер: ТРЕБУЕТ ПРАВКИ — исправляю...','lm-o');dot('copy','busy');ast('copy','as-busy','Исправляет...');setLoad('copy');try{copyRes=await callAI(SC,withKb('Исправь по замечаниям факт-чекера.\n\nТЕКСТ:\n'+copyRes+'\n\nЗАМЕЧАНИЯ:\n'+factRes+'\n\nИсправь только указанное.'));setOut('copy',copyRes,true);dot('copy','done');ast('copy','as-done','Исправлено ✓');elog('Копирайтер исправил','lm-g');}catch(e){elog('Ошибка: '+e.message,'lm-r');}}
+  try{factRes=await callAIStream(SFC,[{role:'user',content:withKb('Проверь:\nБРИФ:\n'+brief+'\n\nТЕКСТ:\n'+copyRes)}],function(c){appendStream('factcheck',c);});}
+  catch(e){factRes='Ошибка: '+e.message;}
+  finalizeStream('factcheck',factRes,false);dot('factcheck','done');ast('factcheck','as-done','Готово ✓');
+  elog('Факт-чекер завершил','lm-g');
+
+  if(factRes.toLowerCase().indexOf('требует правки')>=0){
+    elog('Факт-чекер: ТРЕБУЕТ ПРАВКИ — исправляю...','lm-o');
+    dot('copy','busy');ast('copy','as-busy','Исправляет...');setStreamStart('copy');
+    try{
+      copyRes=await callAIStream(SC,[{role:'user',content:withKb('Исправь по замечаниям факт-чекера.\n\nТЕКСТ:\n'+copyRes+'\n\nЗАМЕЧАНИЯ:\n'+factRes+'\n\nИсправь только указанное.')}],function(c){appendStream('copy',c);});
+      finalizeStream('copy',copyRes,true);dot('copy','done');ast('copy','as-done','Исправлено ✓');
+      elog('Копирайтер исправил','lm-g');
+    }catch(e){elog('Ошибка: '+e.message,'lm-r');}
+  }
 
   var edRes='',ok=false;
   for(var iter=0;iter<2;iter++){
-    dot('editor','busy');ast('editor','as-busy',iter===0?'Проверяет...':'Повторная проверка...');setLoad('editor');elog('Редактор'+(iter>0?' (итер.2)':'')+'...','lm-o');
-    try{edRes=await callAI(SE,withKb('Проверь.\nБРИФ:\n'+brief+'\n\nТЕКСТ:\n'+copyRes+'\n\nВИЗУАЛ:\n'+visRes));}catch(e){elog('Ошибка редактора: '+e.message,'lm-r');setSt(id,'error');S.running=false;return;}
-    setOut('editor',edRes,false);dot('editor','done');ast('editor','as-done','Готово ✓');ok=edRes.toLowerCase().indexOf('требует')===-1;if(ok||iter===1)break;
-    elog('Редактор: ТРЕБУЕТ ДОРАБОТКИ...','lm-o');dot('copy','busy');ast('copy','as-busy','Дорабатывает...');setLoad('copy');
-    try{copyRes=await callAI(SC,withKb('Доработай.\n\nТЕКСТ:\n'+copyRes+'\n\nЗАМЕЧАНИЯ:\n'+edRes));}catch(e){elog('Ошибка: '+e.message,'lm-r');break;}
-    setOut('copy',copyRes,true);dot('copy','done');ast('copy','as-done','Доработано ✓');elog('Копирайтер доработал','lm-g');
+    dot('editor','busy');ast('editor','as-busy',iter===0?'Проверяет...':'Повторная проверка...');setStreamStart('editor');
+    elog('Редактор'+(iter>0?' (итер.2)':'')+'...','lm-o');
+    try{
+      edRes=await callAIStream(SE,[{role:'user',content:withKb('Проверь.\nБРИФ:\n'+brief+'\n\nТЕКСТ:\n'+copyRes+'\n\nВИЗУАЛ:\n'+visRes)}],function(c){appendStream('editor',c);});
+    }catch(e){elog('Ошибка редактора: '+e.message,'lm-r');setSt(id,'error');S.running=false;return;}
+    finalizeStream('editor',edRes,false);dot('editor','done');ast('editor','as-done','Готово ✓');
+    ok=edRes.toLowerCase().indexOf('требует')===-1;if(ok||iter===1)break;
+    elog('Редактор: ТРЕБУЕТ ДОРАБОТКИ...','lm-o');dot('copy','busy');ast('copy','as-busy','Дорабатывает...');setStreamStart('copy');
+    try{
+      copyRes=await callAIStream(SC,[{role:'user',content:withKb('Доработай.\n\nТЕКСТ:\n'+copyRes+'\n\nЗАМЕЧАНИЯ:\n'+edRes)}],function(c){appendStream('copy',c);});
+      finalizeStream('copy',copyRes,true);dot('copy','done');ast('copy','as-done','Доработано ✓');
+      elog('Копирайтер доработал','lm-g');
+    }catch(e){elog('Ошибка: '+e.message,'lm-r');break;}
   }
   document.getElementById('edVerdict').innerHTML='<div class="verdict '+(ok?'v-ok':'v-warn')+'">'+(ok?'✅ Редактор одобрил':'⚠️ Достигнут лимит итераций')+'</div>';
   document.getElementById('cp-editor').style.display='inline-flex';
   row.result={copy:copyRes,visual:visRes,editor:edRes,research:researchRes,analyst:analystRes,factcheck:factRes,approved:false};
-  setSt(id,'review');dot('manager','busy');ast('manager','as-busy','Ждёт согласования');elog('Передаю на согласование...','lm-g');mlog('Материалы готовы.');
+  setSt(id,'review');dot('manager','busy');ast('manager','as-busy','Ждёт согласования');
+  elog('Передаю на согласование...','lm-g');mlog('Материалы готовы.');
   S.running=false;updBadge();autoSave();showAppr(id);
 }
 
@@ -687,16 +815,41 @@ async function sendRework(id){
   var SC2='Ты — Копирайтер СберПремьер. ГОТОВЫЙ текст + ТОЧНЫЕ правки.\nПравило: применяй ТОЛЬКО правки. Не переписывай с нуля. Сохрани структуру. Никаких **, ##.';
   var SE2='Ты — Редактор СберПремьер.\nФОРМАТ: summary → чеклист (✅/⚠️/❌) → ВЕРДИКТ: ОДОБРЕНО или ТРЕБУЕТ ДОРАБОТКИ';
   S.running=true;row.status='inprog';renderPlan();dot('copy','busy');ast('copy','as-busy','Применяет правки...');
+  setStreamStart('copy');
   try{
-    var newCopy=await callAI(SC2,withKb('Текст (исправь точечно):\n\n'+row.result.copy+'\n\n---\nПРАВКИ (применяй только их):\n\n'+notes));
-    dot('copy','done');ast('copy','as-done','Доработано ✓');setOut('copy',newCopy,true);dot('editor','busy');ast('editor','as-busy','Проверяет...');
-    var newEd=await callAI(SE2,withKb('Проверь.\nБРИФ:\n'+brief+'\n\nТЕКСТ:\n'+newCopy));
-    setOut('editor',newEd,false);dot('editor','done');ast('editor','as-done','Готово ✓');row.result.copy=newCopy;row.result.editor=newEd;
+    var newCopy=await callAIStream(SC2,[{role:'user',content:withKb('Текст (исправь точечно):\n\n'+row.result.copy+'\n\n---\nПРАВКИ (применяй только их):\n\n'+notes)}],function(c){appendStream('copy',c);});
+    finalizeStream('copy',newCopy,true);dot('copy','done');ast('copy','as-done','Доработано ✓');
+    dot('editor','busy');ast('editor','as-busy','Проверяет...');setStreamStart('editor');
+    var newEd=await callAIStream(SE2,[{role:'user',content:withKb('Проверь.\nБРИФ:\n'+brief+'\n\nТЕКСТ:\n'+newCopy)}],function(c){appendStream('editor',c);});
+    finalizeStream('editor',newEd,false);dot('editor','done');ast('editor','as-done','Готово ✓');
+    row.result.copy=newCopy;row.result.editor=newEd;
     row.status='review';S.running=false;renderPlan();updBadge();elog('Доработка завершена.','lm-g');autoSave();showAppr(id);
   }catch(e){S.running=false;row.status='review';renderPlan();elog('Ошибка: '+e.message,'lm-r');showAppr(id);}
 }
 function renderResults(){var el=document.getElementById('resPage');if(!S.results.length){el.innerHTML='<div class="empty"><div class="ei">📦</div><p>Выполненные задачи появятся здесь</p></div>';return;}el.innerHTML=S.results.map(function(r,ri){var appr=r.result&&r.result.approved;var ch=r.channels.map(function(c){return '<span class="chan c-'+c+'">'+(CM[c]||c)+'</span>';}).join('');var copyTxt=(r.result&&r.result.copy)?r.result.copy:'';return '<div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="font-weight:700;font-size:13px;flex:1">'+esc(r.topic)+'</div><span class="sb '+(appr?'sb-done':'sb-rev')+'">'+(appr?'Одобрено':'На доработке')+'</span><span style="font-size:10px;color:var(--t3)">'+fmtD(r.date)+'</span></div><div style="margin-bottom:8px">'+ch+'</div><details><summary>Показать тексты</summary><div style="font-size:11px;background:var(--surf2);border-radius:var(--rs);padding:10px;margin-top:6px;white-space:pre-wrap;line-height:1.65">'+esc(copyTxt)+'</div></details><div style="margin-top:8px"><button class="btn btn-g btn-xs" onclick="cpTxt('+ri+')">Скопировать тексты</button></div></div>';}).join('');var nb=document.getElementById('nb-res');if(nb){nb.textContent=S.results.length;nb.style.display='inline';}}
 function cpTxt(i){var r=S.results[i];if(r&&r.result&&r.result.copy)navigator.clipboard.writeText(r.result.copy);}
+
+// ===== [2] ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ СТРИМИНГА =====
+function setStreamStart(id){
+  var e=document.getElementById('out-'+id);
+  if(e){e.className='out';e.textContent='';e.innerHTML='<span class="streaming-cursor"></span>';}
+}
+function appendStream(id,chunk){
+  var e=document.getElementById('out-'+id);if(!e)return;
+  var cursor=e.querySelector('.streaming-cursor');
+  if(cursor){cursor.insertAdjacentText('beforebegin',chunk);}
+  else{e.textContent+=chunk;}
+  // Автоскролл страницы агента если открыта
+  var page=e.closest('.ps');if(page)page.scrollTop=page.scrollHeight;
+}
+function finalizeStream(id,txt,editable){
+  var e=document.getElementById('out-'+id);if(!e)return;
+  e.className='out';e.textContent=txt;e.style.display='block';
+  var ea=document.getElementById('edit-'+id);if(ea)ea.style.display='none';
+  var cp=document.getElementById('cp-'+id);if(cp)cp.style.display='inline-flex';
+  var ed=document.getElementById('ed-'+id);if(ed)ed.style.display=editable?'inline-flex':'none';
+}
+
 function setLoad(id){var e=document.getElementById('out-'+id);if(e){e.className='out shimmer';e.textContent='Загружаю...';}}
 function setOut(id,txt,editable){var e=document.getElementById('out-'+id);if(!e)return;e.className='out';e.textContent=txt;e.style.display='block';var ea=document.getElementById('edit-'+id);if(ea)ea.style.display='none';var cp=document.getElementById('cp-'+id);if(cp)cp.style.display='inline-flex';var ed=document.getElementById('ed-'+id);if(ed)ed.style.display=editable?'inline-flex':'none';}
 function togEdit(id){var box=document.getElementById('out-'+id),ea=document.getElementById('edit-'+id),btn=document.getElementById('ed-'+id);if(ea.style.display==='block'){box.textContent=ea.value;box.style.display='block';ea.style.display='none';btn.textContent='✏️ Редактировать';}else{ea.value=box.textContent;box.style.display='none';ea.style.display='block';btn.textContent='✓ Сохранить';}}
@@ -705,7 +858,67 @@ function switchPlanTab(tab){document.getElementById('plan-panel-tasks').style.di
 function renderCalendar(){var el=document.getElementById('calendarView');if(!el)return;if(!S.plan.length){el.innerHTML='<div class="empty"><div class="ei">📅</div><p>Нет задач.</p></div>';return;}var days=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];var months=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];var stColors={todo:'ct-todo',inprog:'ct-inprog',done:'ct-done',review:'ct-review',error:'ct-error'};var byMonth={};S.plan.forEach(function(r){if(!r.date)return;var d=new Date(r.date+'T00:00:00');var key=d.getFullYear()+'-'+(d.getMonth());if(!byMonth[key])byMonth[key]={year:d.getFullYear(),month:d.getMonth(),tasks:[]};byMonth[key].tasks.push(r);});var html='';var today=new Date();today.setHours(0,0,0,0);Object.keys(byMonth).sort().forEach(function(key){var m=byMonth[key];var firstDay=new Date(m.year,m.month,1);var lastDay=new Date(m.year,m.month+1,0);var startDow=(firstDay.getDay()+6)%7;html+='<div class="cal-month"><div class="cal-month-title">'+months[m.month]+' '+m.year+'</div><div class="cal-grid">';days.forEach(function(d){html+='<div class="cal-day-hdr">'+d+'</div>';});for(var i=0;i<startDow;i++)html+='<div class="cal-day other-month"></div>';for(var day=1;day<=lastDay.getDate();day++){var date=new Date(m.year,m.month,day);date.setHours(0,0,0,0);var dateStr=date.toISOString().slice(0,10);var isToday=date.getTime()===today.getTime();var dayTasks=m.tasks.filter(function(r){return r.date===dateStr;});html+='<div class="cal-day'+(isToday?' today':'')+(date.getDay()===0||date.getDay()===6?' other-month':'')+'"><div class="cal-day-num">'+day+'</div>';dayTasks.forEach(function(r){var cc=stColors[r.status]||'ct-todo';html+='<div class="cal-task '+cc+'" onclick="showAppr('+r.id+')" title="'+r.topic+'">'+r.topic.slice(0,22)+(r.topic.length>22?'…':'')+'</div>';});html+='</div>';}var total=startDow+lastDay.getDate();for(var i=0;i<(7-total%7)%7;i++)html+='<div class="cal-day other-month"></div>';html+='</div></div>';});el.innerHTML=html;}
 function elog(msg,cls){var el=document.getElementById('execLog'),t=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});var d=document.createElement('div');d.className='le';d.innerHTML='<span class="lt">'+t+'</span><span class="lm '+(cls||'')+'">'+msg+'</span>';el.appendChild(d);el.scrollTop=el.scrollHeight;}
 function mlog(msg){var el=document.getElementById('managerLog'),t=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});var d=document.createElement('div');d.className='le';d.innerHTML='<span class="lt">'+t+'</span><span class="lm">'+msg+'</span>';el.appendChild(d);el.scrollTop=el.scrollHeight;}
-async function callAI(sys,user){if(!S.apiKey)throw new Error('API ключ не введён');var r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:MDL,max_tokens:2000,system:sys,messages:[{role:'user',content:user}]})});if(!r.ok){var t=await r.text();throw new Error('HTTP '+r.status+': '+t.slice(0,150));}var d=await r.json();if(d.error)throw new Error(d.error.message);return(d.content&&d.content[0]&&d.content[0].text)?d.content[0].text:'';}
+
+// ===== [1,2,4] ОСНОВНЫЕ ФУНКЦИИ API =====
+
+// callAI — обычный запрос (для совместимости, используется в AI-плане)
+async function callAI(sys,user,retries){
+  if(!S.apiKey)throw new Error('API ключ не введён');
+  retries=retries||0;
+  var r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:MDL,max_tokens:2000,system:sys,messages:[{role:'user',content:user}]})});
+  // [4] Обработка rate limit: при 429 ждём и повторяем (до 3 попыток)
+  if(r.status===429){
+    if(retries<3){
+      var wait=Math.pow(2,retries+1)*1000; // 2s, 4s, 8s
+      elog('⏳ Rate limit, жду '+Math.round(wait/1000)+'с...','lm-o');
+      await new Promise(function(res){setTimeout(res,wait);});
+      return callAI(sys,user,retries+1);
+    }
+    throw new Error('Rate limit: слишком много запросов. Подожди немного.');
+  }
+  if(!r.ok){var t=await r.text();throw new Error('HTTP '+r.status+': '+t.slice(0,150));}
+  var d=await r.json();if(d.error)throw new Error(d.error.message);
+  return(d.content&&d.content[0]&&d.content[0].text)?d.content[0].text:'';
+}
+
+// [2] callAIStream — стриминговый запрос, вызывает onChunk по мере получения текста
+// messages — массив {role, content}, sys — системный промпт
+async function callAIStream(sys,messages,onChunk,retries){
+  if(!S.apiKey)throw new Error('API ключ не введён');
+  retries=retries||0;
+  var r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:MDL,max_tokens:2000,stream:true,system:sys,messages:messages})});
+  // [4] Rate limit retry для стриминга
+  if(r.status===429){
+    if(retries<3){
+      var wait=Math.pow(2,retries+1)*1000;
+      elog('⏳ Rate limit, жду '+Math.round(wait/1000)+'с...','lm-o');
+      await new Promise(function(res){setTimeout(res,wait);});
+      return callAIStream(sys,messages,onChunk,retries+1);
+    }
+    throw new Error('Rate limit: слишком много запросов.');
+  }
+  if(!r.ok){var t=await r.text();throw new Error('HTTP '+r.status+': '+t.slice(0,150));}
+  var reader=r.body.getReader();var decoder=new TextDecoder();var fullText='';var buf='';
+  while(true){
+    var res=await reader.read();if(res.done)break;
+    buf+=decoder.decode(res.value,{stream:true});
+    var lines=buf.split('\n');buf=lines.pop();
+    for(var i=0;i<lines.length;i++){
+      var line=lines[i].trim();
+      if(!line||!line.startsWith('data:'))continue;
+      var data=line.slice(5).trim();
+      if(data==='[DONE]')continue;
+      try{
+        var ev=JSON.parse(data);
+        if(ev.type==='content_block_delta'&&ev.delta&&ev.delta.type==='text_delta'){
+          var chunk=ev.delta.text||'';fullText+=chunk;if(onChunk)onChunk(chunk);
+        }
+      }catch(e){}
+    }
+  }
+  return fullText;
+}
+
 document.getElementById('m-date').value=toDay();
 lsLoad();
 </script>
