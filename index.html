@@ -13,7 +13,6 @@
   --green:#21A038;--green-bg:rgba(33,160,56,.08);--green-brd:rgba(33,160,56,.25);
   --amber:#C8880A;--amber-bg:rgba(200,136,10,.08);--amber-brd:rgba(200,136,10,.25);
   --red:#D63B3B;--red-bg:rgba(214,59,59,.07);--red-brd:rgba(214,59,59,.22);
-  --tg:#229ED9;--tg-bg:rgba(34,158,217,.08);--tg-brd:rgba(34,158,217,.25);
   --t1:#111C17;--t2:#4A6454;--t3:#8AA090;--t4:#B8CCBE;
   --r:10px;--rs:7px;--rl:14px;
 }
@@ -68,8 +67,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--rs);font-size:12px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .1s;white-space:nowrap;font-family:inherit;line-height:1}
 .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
 .btn-primary:hover{background:var(--accent-d)}
-.btn-tg{background:var(--tg);color:#fff;border-color:var(--tg)}
-.btn-tg:hover{background:#1a8abf}
 .btn-default{background:transparent;color:var(--t2);border-color:var(--brd2)}
 .btn-default:hover{background:var(--surf2);color:var(--t1);border-color:var(--brd3)}
 .btn-ghost{background:transparent;color:var(--t2);border:none}
@@ -84,22 +81,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
 .card-title{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
 .card-desc{font-size:11px;color:var(--t3);margin:-8px 0 12px;line-height:1.55}
-
-/* ── Telegram card ── */
-.tg-card{background:var(--surf);border:1px solid var(--tg-brd);border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
-.tg-card .card-title{color:var(--tg)}
-.tg-post-item{background:var(--surf2);border:1px solid var(--brd);border-radius:var(--rs);padding:10px 12px;margin-top:7px;position:relative}
-.tg-post-meta{font-size:10px;color:var(--t3);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center}
-.tg-post-text{font-size:12px;color:var(--t1);line-height:1.6;white-space:pre-wrap;max-height:120px;overflow:hidden;position:relative}
-.tg-post-text.expanded{max-height:none}
-.tg-post-expand{font-size:10px;color:var(--tg);cursor:pointer;margin-top:4px;display:inline-block}
-.tg-post-actions{display:flex;gap:5px;margin-top:8px}
-.tg-channel-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--tg-bg);border:1px solid var(--tg-brd);border-radius:var(--rs);font-size:12px;margin-top:6px}
-.tg-channel-name{flex:1;font-weight:500;color:var(--tg)}
-.tg-channel-count{font-size:10px;color:var(--t3)}
-.tg-loading{text-align:center;padding:16px;font-size:12px;color:var(--t3)}
-.tg-error{font-size:11px;color:var(--red);margin-top:6px;padding:8px 10px;background:var(--red-bg);border-radius:var(--rs);border:1px solid var(--red-brd)}
-
 input[type=text],input[type=url],input[type=date],select,textarea{border:1px solid var(--brd2);border-radius:var(--rs);padding:7px 10px;font-size:12px;color:var(--t1);background:var(--surf2);font-family:inherit;transition:border-color .12s;width:100%}
 input[type=text]::placeholder,input[type=url]::placeholder,textarea::placeholder{color:var(--t3)}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);background:var(--surf)}
@@ -334,8 +315,6 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
   </div>
 </nav>
 <main class="main">
-
-<!-- База знаний -->
 <div class="page active" id="page-kb">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">База знаний</div><div class="ph-desc">Документы и контекст для всех агентов команды</div></div></div></div>
   <div class="ps">
@@ -346,20 +325,6 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
       <input type="file" id="fi" multiple accept=".txt,.md,.pdf,.docx" style="display:none" onchange="loadFiles(this.files)">
       <div id="fileList"></div>
     </div>
-
-    <!-- ── Telegram-каналы ── -->
-    <div class="tg-card">
-      <div class="card-title">✈️ Telegram-каналы</div>
-      <div class="card-desc">Загружай посты из публичных каналов через RSS — агенты обучатся их стилю</div>
-      <div style="display:flex;gap:7px;margin-bottom:8px">
-        <input type="text" id="tgChannelInp" placeholder="@sberpremier или sberpremier" style="flex:1">
-        <button class="btn btn-tg btn-sm" onclick="loadTgChannel()" id="tgLoadBtn">Загрузить посты</button>
-      </div>
-      <div style="font-size:10px;color:var(--t3);margin-bottom:10px">Канал должен быть публичным. Работает через RSS-прокси.</div>
-      <div id="tgChannelList"></div>
-      <div id="tgPostsList"></div>
-    </div>
-
     <div class="card"><div class="card-title">Сайты Сбера</div>
       <div style="display:flex;gap:7px;margin-bottom:8px"><input type="url" id="urlInp" placeholder="https://sberbank.ru/…" style="flex:1"><button class="btn btn-primary btn-sm" onclick="addUrl()">Изучить</button></div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
@@ -412,8 +377,6 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
     </div>
   </div>
 </div>
-
-<!-- Контент-план -->
 <div class="page" id="page-plan">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Контент-план</div><div class="ph-desc">Задачи, статусы и запуск агентов</div></div></div>
     <div class="ph-actions">
@@ -437,8 +400,6 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
     <div id="plan-panel-calendar" style="display:none"><div id="calendarView"></div></div>
   </div>
 </div>
-
-<!-- Менеджер -->
 <div class="page" id="page-manager">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Менеджер</div><div class="ph-desc">Координирует команду · Чат и обратная связь</div></div></div></div>
   <div style="flex:1;overflow:hidden;display:flex;gap:0;padding:16px 24px 0">
@@ -462,8 +423,6 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
     </div>
   </div>
 </div>
-
-<!-- Агент-страницы -->
 <div class="page" id="page-researcher">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Исследователь</div><div class="ph-desc">Факты, кейсы и инсайты</div></div></div></div>
   <div class="ps">
@@ -477,7 +436,6 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
     </div>
   </div>
 </div>
-
 <div class="page" id="page-analyst">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Аналитик</div><div class="ph-desc">Цифры, статистика, крючки</div></div></div></div>
   <div class="ps">
@@ -491,7 +449,6 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
     </div>
   </div>
 </div>
-
 <div class="page" id="page-copy">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Копирайтер</div><div class="ph-desc">Тексты под каждый канал</div></div></div></div>
   <div class="ps">
@@ -506,7 +463,6 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
     </div>
   </div>
 </div>
-
 <div class="page" id="page-visual">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Визуалист</div><div class="ph-desc">Концепции и промпты для изображений</div></div></div></div>
   <div class="ps">
@@ -519,7 +475,6 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
     </div>
   </div>
 </div>
-
 <div class="page" id="page-factcheck">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Факт-чекер</div><div class="ph-desc">Проверка достоверности и юридической чистоты</div></div></div></div>
   <div class="ps">
@@ -532,7 +487,6 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
     </div>
   </div>
 </div>
-
 <div class="page" id="page-editor">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Редактор</div><div class="ph-desc">Грамматика, TOV, юридическая чистота</div></div></div></div>
   <div class="ps">
@@ -546,19 +500,16 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
     </div>
   </div>
 </div>
-
 <div class="page" id="page-approval">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Финальное согласование</div><div class="ph-desc">Проверь материалы и прими решение</div></div></div></div>
   <div class="ps" id="apprPage"><div class="empty"><div class="empty-icon">🖊</div><p>Здесь появятся материалы, готовые к согласованию</p></div></div>
 </div>
-
 <div class="page" id="page-results">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Архив результатов</div><div class="ph-desc">Одобренные и выполненные задачи</div></div></div></div>
   <div class="ps" id="resPage"><div class="empty"><div class="empty-icon">📦</div><p>Выполненные задачи появятся здесь</p></div></div>
 </div>
 </main>
 </div>
-
 <div class="overlay" id="planWizardOverlay">
   <div class="wizard">
     <div class="wiz-head">
@@ -574,7 +525,6 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
     <div class="wiz-foot" id="pwFoot"></div>
   </div>
 </div>
-
 <div class="overlay" id="addModal">
   <div class="modal">
     <div class="modal-title">Новая задача</div>
@@ -599,207 +549,13 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
     <div class="modal-footer"><button class="btn btn-default" onclick="hideModal()">Отмена</button><button class="btn btn-primary" onclick="saveTask()">Добавить</button></div>
   </div>
 </div>
-
 <script>
 var API='https://api.anthropic.com/v1/messages';
 var MDL='claude-sonnet-4-6';
 var CM={tg:'TG',sms:'SMS',push:'Push',site:'Сайт'};
 var TM={post:'Пост',sms:'SMS/Push',article:'Статья',banner:'Баннер',research:'Исследование'};
-var S={apiKey:'',kb:{files:[],snippets:[],manual:'',examples:'',copyInstr:'',approvedSamples:[],tgChannels:[]},plan:[],nid:1,running:false,results:[]};
+var S={apiKey:'',kb:{files:[],snippets:[],manual:'',examples:'',copyInstr:'',approvedSamples:[]},plan:[],nid:1,running:false,results:[]};
 var chatHistory=[];
-
-/* ══════════════════════════════════════════
-   TELEGRAM RSS LOADER
-══════════════════════════════════════════ */
-
-// RSS-прокси — пробуем по очереди
-var RSS_PROXIES=[
-  function(ch){return'https://rsshub.app/telegram/channel/'+ch;},
-  function(ch){return'https://rss.app/feeds/telegram/'+ch+'.xml';},
-  function(ch){return'https://fetchrss.com/rss/telegram/'+ch+'.xml';}
-];
-
-// CORS-прокси для обхода ограничений
-var CORS_PROXIES=[
-  function(url){return'https://api.allorigins.win/raw?url='+encodeURIComponent(url);},
-  function(url){return'https://corsproxy.io/?'+encodeURIComponent(url);},
-  function(url){return'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(url);}
-];
-
-async function fetchRss(url){
-  // Сначала без прокси
-  try{
-    var r=await fetch(url,{signal:AbortSignal.timeout(6000)});
-    if(r.ok){var t=await r.text();if(t.includes('<rss')||t.includes('<feed'))return t;}
-  }catch(e){}
-  // С CORS-прокси
-  for(var i=0;i<CORS_PROXIES.length;i++){
-    try{
-      var u=CORS_PROXIES[i](url);
-      var r=await fetch(u,{signal:AbortSignal.timeout(8000)});
-      if(r.ok){var t=await r.text();if(t.includes('<rss')||t.includes('<feed')||t.length>200)return t;}
-    }catch(e){}
-  }
-  return null;
-}
-
-function parseRssItems(xml){
-  var items=[];
-  try{
-    var parser=new DOMParser();
-    var doc=parser.parseFromString(xml,'text/xml');
-    var nodes=doc.querySelectorAll('item, entry');
-    nodes.forEach(function(node){
-      var title=node.querySelector('title');
-      var desc=node.querySelector('description, content\\:encoded, content, summary');
-      var pubDate=node.querySelector('pubDate, published, updated');
-      var raw=(desc?desc.textContent:'')||(title?title.textContent:'');
-      // Убираем HTML-теги
-      var text=raw.replace(/<[^>]+>/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
-      if(text&&text.length>20){
-        items.push({
-          text:text,
-          date:pubDate?pubDate.textContent.trim():''
-        });
-      }
-    });
-  }catch(e){}
-  return items;
-}
-
-async function loadTgChannel(){
-  var inp=document.getElementById('tgChannelInp');
-  var raw=inp.value.trim().replace(/^@/,'').replace(/^https?:\/\/t\.me\//,'').replace(/\//g,'');
-  if(!raw){alert('Введи @username или название канала');return;}
-
-  var btn=document.getElementById('tgLoadBtn');
-  btn.disabled=true;btn.textContent='Загружаю…';
-  var postsDiv=document.getElementById('tgPostsList');
-  postsDiv.innerHTML='<div class="tg-loading">⏳ Подключаюсь к каналу @'+raw+'…</div>';
-
-  var items=null;
-  var usedProxy='';
-
-  for(var pi=0;pi<RSS_PROXIES.length;pi++){
-    var rssUrl=RSS_PROXIES[pi](raw);
-    postsDiv.innerHTML='<div class="tg-loading">⏳ Пробую источник '+(pi+1)+'/'+RSS_PROXIES.length+'…</div>';
-    var xml=await fetchRss(rssUrl);
-    if(xml){
-      items=parseRssItems(xml);
-      if(items.length>0){usedProxy=rssUrl;break;}
-    }
-  }
-
-  btn.disabled=false;btn.textContent='Загрузить посты';
-
-  if(!items||items.length===0){
-    postsDiv.innerHTML='<div class="tg-error">Не удалось загрузить посты канала @'+raw+'.<br>Убедись, что канал публичный и имя написано правильно.<br><br>Если не работает — скопируй посты вручную в поле «Примеры постов» ниже.</div>';
-    return;
-  }
-
-  // Показываем посты для выбора
-  renderTgPosts(raw,items.slice(0,20));
-}
-
-function renderTgPosts(channelName,items){
-  var div=document.getElementById('tgPostsList');
-  var html='<div style="margin-top:10px">';
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-  html+='<div style="font-size:11px;font-weight:600;color:var(--tg)">📋 @'+channelName+' · '+items.length+' постов</div>';
-  html+='<div style="display:flex;gap:5px">';
-  html+='<button class="btn btn-xs" style="background:var(--tg-bg);color:var(--tg);border:1px solid var(--tg-brd)" onclick="tgSelectAll(true)">Выбрать все</button>';
-  html+='<button class="btn btn-xs btn-default" onclick="tgSelectAll(false)">Снять</button>';
-  html+='<button class="btn btn-xs btn-tg" onclick="tgAddSelected(\''+channelName+'\')">✓ Добавить выбранные</button>';
-  html+='</div></div>';
-
-  items.forEach(function(item,i){
-    var short=item.text.slice(0,180);
-    var hasMore=item.text.length>180;
-    html+='<div class="tg-post-item">';
-    html+='<div class="tg-post-meta">';
-    html+='<label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" class="tg-post-cb" data-idx="'+i+'" checked> <span style="font-weight:500;color:var(--t1)">Пост '+(i+1)+'</span></label>';
-    html+='<span>'+formatTgDate(item.date)+'</span>';
-    html+='</div>';
-    html+='<div class="tg-post-text" id="tg-text-'+i+'">'+esc(short)+(hasMore?'':'')+'</div>';
-    if(hasMore)html+='<span class="tg-post-expand" onclick="expandTgPost('+i+',\''+esc(item.text.replace(/'/g,"&#39;"))+'\')">Показать полностью…</span>';
-    html+='</div>';
-  });
-  html+='</div>';
-  div.innerHTML=html;
-
-  // Сохраняем тексты для последующего добавления
-  window._tgPostsCache=items;
-}
-
-function formatTgDate(d){if(!d)return'';try{return new Date(d).toLocaleDateString('ru-RU',{day:'numeric',month:'short'});}catch(e){return'';}}
-
-function expandTgPost(idx,fullText){
-  var el=document.getElementById('tg-text-'+idx);
-  if(el){el.textContent=fullText;el.classList.add('expanded');}
-  var btn=el.nextElementSibling;if(btn&&btn.classList.contains('tg-post-expand'))btn.remove();
-}
-
-function tgSelectAll(sel){
-  document.querySelectorAll('.tg-post-cb').forEach(function(cb){cb.checked=sel;});
-}
-
-function tgAddSelected(channelName){
-  var cbs=document.querySelectorAll('.tg-post-cb');
-  var selected=[];
-  cbs.forEach(function(cb){
-    if(cb.checked){
-      var idx=parseInt(cb.dataset.idx);
-      if(window._tgPostsCache&&window._tgPostsCache[idx])selected.push(window._tgPostsCache[idx].text);
-    }
-  });
-  if(!selected.length){alert('Выбери хотя бы один пост');return;}
-
-  // Добавляем в «Примеры постов»
-  var existing=document.getElementById('examplesInp').value.trim();
-  var newPosts=selected.map(function(t,i){return'Пример из @'+channelName+':\n'+t;}).join('\n\n---\n\n');
-  var combined=existing?(existing+'\n\n---\n\n'+newPosts):newPosts;
-  document.getElementById('examplesInp').value=combined;
-  S.kb.examples=combined;
-
-  // Также сохраняем канал в список
-  if(!S.kb.tgChannels)S.kb.tgChannels=[];
-  if(!S.kb.tgChannels.find(function(c){return c.name===channelName;})){
-    S.kb.tgChannels.push({name:channelName,count:selected.length,date:new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short'})});
-  }
-  renderTgChannels();
-  updateKb();
-  autoSave();
-
-  // Уведомление
-  document.getElementById('tgPostsList').innerHTML='<div style="background:var(--green-bg);border:1px solid var(--green-brd);border-radius:var(--rs);padding:10px 13px;font-size:12px;color:var(--green);margin-top:8px">✓ Добавлено '+selected.length+' постов из @'+channelName+' в примеры стиля</div>';
-  document.getElementById('exSt').textContent='Сохранено';
-  setTimeout(function(){document.getElementById('exSt').textContent='';},2000);
-}
-
-function renderTgChannels(){
-  var div=document.getElementById('tgChannelList');
-  if(!div)return;
-  var channels=S.kb.tgChannels||[];
-  if(!channels.length){div.innerHTML='';return;}
-  div.innerHTML=channels.map(function(c,i){
-    return '<div class="tg-channel-item">'
-      +'<span style="font-size:16px">✈️</span>'
-      +'<span class="tg-channel-name">@'+c.name+'</span>'
-      +'<span class="tg-channel-count">'+c.count+' постов · '+c.date+'</span>'
-      +'<span class="file-del" onclick="delTgChannel('+i+')">✕</span>'
-      +'</div>';
-  }).join('');
-}
-
-function delTgChannel(i){
-  S.kb.tgChannels.splice(i,1);
-  renderTgChannels();
-  autoSave();
-}
-
-/* ══════════════════════════════════════════
-   DEFAULT PROMPTS
-══════════════════════════════════════════ */
 var DEFAULT_PROMPTS={
   researcher:'Ты — Исследователь СберПремьер.\nФОРМАТ:\n📌 КЛЮЧЕВЫЕ ФАКТЫ (3-5)\n💬 РЕАЛЬНЫЕ КЕЙСЫ\n🔍 ИНСАЙТЫ\nОтвечай конкретно.',
   analyst:'Ты — Аналитик СберПремьер.\nФОРМАТ:\n📊 КЛЮЧЕВЫЕ ЦИФРЫ (3-5)\n🏆 КОНТЕКСТ\n💡 КРЮЧКИ ДЛЯ ТЕКСТА',
@@ -813,16 +569,10 @@ function savePrompt(id){customPrompts[id]=document.getElementById('prompt-'+id).
 function resetPrompt(id){customPrompts[id]=DEFAULT_PROMPTS[id];document.getElementById('prompt-'+id).value=DEFAULT_PROMPTS[id];try{localStorage.setItem('sp_prompts',JSON.stringify(customPrompts));}catch(e){}}
 function loadPrompts(){try{var raw=localStorage.getItem('sp_prompts');if(raw)customPrompts=JSON.parse(raw);}catch(e){}Object.keys(DEFAULT_PROMPTS).forEach(function(id){var val=customPrompts[id]||DEFAULT_PROMPTS[id];customPrompts[id]=val;var el=document.getElementById('prompt-'+id);if(el)el.value=val;});}
 function getPrompt(id){return customPrompts[id]||DEFAULT_PROMPTS[id];}
-
-var SBER_KNOWLEDGE={
-  'https://www.sberbank.ru/ru/person/premier':'СберПремьер — премиальный пакет услуг Сбербанка для состоятельных клиентов. Включает: персонального менеджера, приоритетное обслуживание в отдельных зонах отделений, бесплатное обслуживание дебетовой карты Visa Signature/Mastercard World Elite, повышенный кешбэк до 10% бонусами СберСпасибо, доступ к инвестиционным продуктам, страхование, привилегии для всей семьи. Минимальный остаток от 2,5 млн руб. или ежемесячные поступления от 150 000 руб.',
-  'https://www.sberbank.ru/ru/person/premier/family':'СберПремьер Семья — программа привилегий для близких держателя карты СберПремьер. До 5 членов семьи получают: бесплатные карты с привилегиями, персональный менеджер, повышенный кешбэк. Совместный счёт — управление финансами семьи в одном месте.',
-  'https://www.sberbank.ru/ru/person/premier/privileges':'Привилегии СберПремьер: доступ в бизнес-залы аэропортов по карте Priority Pass (более 1300 залов по миру), страховка для путешественников, бесплатные переводы и конвертация валюты по выгодному курсу, кешбэк до 10% в ресторанах и travel-категориях.'
-};
-
-var LS='sberpremier_v8';
-function lsSave(){try{var d={apiKey:S.apiKey,kb:{manual:S.kb.manual,examples:S.kb.examples,snippets:S.kb.snippets,copyInstr:S.kb.copyInstr,approvedSamples:S.kb.approvedSamples,tgChannels:S.kb.tgChannels||[]},plan:S.plan.map(function(r){var c=Object.assign({},r);if(c.result)c.result=Object.assign({},c.result,{imageUrl:undefined});return c;}),nid:S.nid,results:S.results.map(function(r){var c=Object.assign({},r);if(c.result)c.result=Object.assign({},c.result,{imageUrl:undefined});return c;})};localStorage.setItem(LS,JSON.stringify(d));showSaveFlash();}catch(e){}}
-function lsLoad(){try{var raw=localStorage.getItem(LS);if(!raw)return;var d=JSON.parse(raw);if(d.apiKey){S.apiKey=d.apiKey;showKeyStatus();}if(d.kb){if(d.kb.manual){S.kb.manual=d.kb.manual;document.getElementById('manInp').value=d.kb.manual;}if(d.kb.examples){S.kb.examples=d.kb.examples;document.getElementById('examplesInp').value=d.kb.examples;}if(d.kb.snippets)S.kb.snippets=d.kb.snippets;if(d.kb.copyInstr){S.kb.copyInstr=d.kb.copyInstr;document.getElementById('copyInstrInp').value=d.kb.copyInstr;}if(d.kb.approvedSamples)S.kb.approvedSamples=d.kb.approvedSamples;if(d.kb.tgChannels)S.kb.tgChannels=d.kb.tgChannels;renderSnippets();updateKb();renderApprovedSamples();renderTgChannels();}if(d.plan){S.plan=d.plan;S.nid=d.nid||S.plan.length+1;}if(d.results)S.results=d.results;renderPlan();updBadge();renderResults();}catch(e){}}
+var SBER_KNOWLEDGE={'https://www.sberbank.ru/ru/person/premier':'СберПремьер — премиальный пакет услуг Сбербанка для состоятельных клиентов. Включает: персонального менеджера, приоритетное обслуживание в отдельных зонах отделений, бесплатное обслуживание дебетовой карты Visa Signature/Mastercard World Elite, повышенный кешбэк до 10% бонусами СберСпасибо, доступ к инвестиционным продуктам, страхование, привилегии для всей семьи. Минимальный остаток от 2,5 млн руб. или ежемесячные поступления от 150 000 руб.','https://www.sberbank.ru/ru/person/premier/family':'СберПремьер Семья — программа привилегий для близких держателя карты СберПремьер. До 5 членов семьи получают: бесплатные карты с привилегиями, персональный менеджер, повышенный кешбэк. Совместный счёт — управление финансами семьи в одном месте.','https://www.sberbank.ru/ru/person/premier/privileges':'Привилегии СберПремьер: доступ в бизнес-залы аэропортов по карте Priority Pass (более 1300 залов по миру), страховка для путешественников, бесплатные переводы и конвертация валюты по выгодному курсу, кешбэк до 10% в ресторанах и travel-категориях.'};
+var LS='sberpremier_v7';
+function lsSave(){try{var d={apiKey:S.apiKey,kb:{manual:S.kb.manual,examples:S.kb.examples,snippets:S.kb.snippets,copyInstr:S.kb.copyInstr,approvedSamples:S.kb.approvedSamples},plan:S.plan.map(function(r){var c=Object.assign({},r);if(c.result)c.result=Object.assign({},c.result,{imageUrl:undefined});return c;}),nid:S.nid,results:S.results.map(function(r){var c=Object.assign({},r);if(c.result)c.result=Object.assign({},c.result,{imageUrl:undefined});return c;})};localStorage.setItem(LS,JSON.stringify(d));showSaveFlash();}catch(e){}}
+function lsLoad(){try{var raw=localStorage.getItem(LS);if(!raw)return;var d=JSON.parse(raw);if(d.apiKey){S.apiKey=d.apiKey;showKeyStatus();}if(d.kb){if(d.kb.manual){S.kb.manual=d.kb.manual;document.getElementById('manInp').value=d.kb.manual;}if(d.kb.examples){S.kb.examples=d.kb.examples;document.getElementById('examplesInp').value=d.kb.examples;}if(d.kb.snippets)S.kb.snippets=d.kb.snippets;if(d.kb.copyInstr){S.kb.copyInstr=d.kb.copyInstr;document.getElementById('copyInstrInp').value=d.kb.copyInstr;}if(d.kb.approvedSamples)S.kb.approvedSamples=d.kb.approvedSamples;renderSnippets();updateKb();renderApprovedSamples();}if(d.plan){S.plan=d.plan;S.nid=d.nid||S.plan.length+1;}if(d.results)S.results=d.results;renderPlan();updBadge();renderResults();}catch(e){}}
 var _st=null;function autoSave(){clearTimeout(_st);_st=setTimeout(lsSave,700);}
 function showSaveFlash(){var b=document.getElementById('saveBadge');b.style.display='inline-block';clearTimeout(b._t);b._t=setTimeout(function(){b.style.display='none';},2000);}
 function saveKey(){var k=document.getElementById('keyInp').value.trim();if(!k){alert('Введи API ключ');return;}S.apiKey=k;document.getElementById('keyInp').value='';showKeyStatus();lsSave();}
@@ -852,26 +602,7 @@ function renderApprovedSamples(){var list=document.getElementById('approvedSampl
 function removeApprovedSample(i){S.kb.approvedSamples.splice(i,1);renderApprovedSamples();updateKb();autoSave();}
 function clearApprovedSamples(){if(confirm('Очистить всю базу стилей?')){S.kb.approvedSamples=[];renderApprovedSamples();updateKb();autoSave();}}
 function approvedCtx(){if(!S.kb.approvedSamples.length)return'';return'=== ОДОБРЕННЫЕ ТЕКСТЫ (ЭТАЛОН СТИЛЯ) ===\n'+S.kb.approvedSamples.map(function(s,i){return'[Эталон '+(i+1)+'] «'+s.topic+'»:\n'+s.text;}).join('\n\n');}
-function updateKb(){
-  var n=S.kb.files.length+S.kb.snippets.length+(S.kb.manual?1:0)+(S.kb.examples?1:0)+(S.kb.copyInstr?1:0)+(S.kb.approvedSamples.length?1:0)+((S.kb.tgChannels&&S.kb.tgChannels.length)?1:0);
-  document.getElementById('kbCount').textContent=n;
-  document.getElementById('kbBadge').textContent=n?'База: '+n+' ист.':'База: пусто';
-  document.getElementById('kbBadge').className='pill '+(n?'pill-green':'pill-muted');
-  dot('kb',n?'done':'');
-  var mst=document.getElementById('mgr-kb-status');
-  if(mst){if(!n){mst.textContent='Нет данных';mst.style.color='var(--t3)';}else{var parts=[];if(S.kb.files.length)parts.push(S.kb.files.length+' файл(а)');if(S.kb.snippets.length)parts.push(S.kb.snippets.length+' сайт(а)');if(S.kb.tgChannels&&S.kb.tgChannels.length)parts.push('TG: '+S.kb.tgChannels.map(function(c){return'@'+c.name;}).join(', '));if(S.kb.manual)parts.push('TOV');if(S.kb.examples)parts.push('примеры');if(S.kb.copyInstr)parts.push('инструкции');if(S.kb.approvedSamples.length)parts.push('эталонов: '+S.kb.approvedSamples.length);mst.innerHTML='<span style="color:var(--green);font-weight:600">✓</span> '+parts.join(', ');}}
-  var el=document.getElementById('kbEntries');
-  if(!n){el.innerHTML='<div class="empty"><div class="empty-icon">🗂</div><p>База пуста</p></div>';return;}
-  var items=[];
-  S.kb.files.forEach(function(f,i){items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">📄</span><span class="file-name">'+f.name+'</span><span class="file-del" onclick="delFile('+i+')">✕</span></div>');});
-  S.kb.snippets.forEach(function(s,i){items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">🌐</span><span class="file-name">'+s.url+'</span><span class="file-del" onclick="delSnip('+i+')">✕</span></div>');});
-  if(S.kb.tgChannels&&S.kb.tgChannels.length)S.kb.tgChannels.forEach(function(c,i){items.push('<div class="file-item" style="margin-top:5px;background:var(--tg-bg);border-color:var(--tg-brd)"><span style="font-size:13px">✈️</span><span class="file-name" style="color:var(--tg)">@'+c.name+' · '+c.count+' постов</span><span class="file-del" onclick="delTgChannel('+i+')">✕</span></div>');});
-  if(S.kb.manual)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">✍️</span><span class="file-name">Tone of voice</span><span class="file-del" onclick="clearMan()">✕</span></div>');
-  if(S.kb.examples)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">📝</span><span class="file-name">Примеры постов</span><span class="file-del" onclick="clearExamples()">✕</span></div>');
-  if(S.kb.copyInstr)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">🎯</span><span class="file-name">Инструкции копирайтера</span><span class="file-del" onclick="clearCopyInstr()">✕</span></div>');
-  if(S.kb.approvedSamples.length)items.push('<div class="file-item" style="margin-top:5px;background:var(--green-bg);border-color:var(--green-brd)"><span style="font-size:13px">🎓</span><span class="file-name" style="color:var(--green)">Эталоны стиля: '+S.kb.approvedSamples.length+' текстов</span><span class="file-del" onclick="clearApprovedSamples()">✕</span></div>');
-  el.innerHTML=items.join('');
-}
+function updateKb(){var n=S.kb.files.length+S.kb.snippets.length+(S.kb.manual?1:0)+(S.kb.examples?1:0)+(S.kb.copyInstr?1:0)+(S.kb.approvedSamples.length?1:0);document.getElementById('kbCount').textContent=n;document.getElementById('kbBadge').textContent=n?'База: '+n+' ист.':'База: пусто';document.getElementById('kbBadge').className='pill '+(n?'pill-green':'pill-muted');dot('kb',n?'done':'');var mst=document.getElementById('mgr-kb-status');if(mst){if(!n){mst.textContent='Нет данных';mst.style.color='var(--t3)';}else{var parts=[];if(S.kb.files.length)parts.push(S.kb.files.length+' файл(а)');if(S.kb.snippets.length)parts.push(S.kb.snippets.length+' сайт(а)');if(S.kb.manual)parts.push('TOV');if(S.kb.examples)parts.push('примеры');if(S.kb.copyInstr)parts.push('инструкции');if(S.kb.approvedSamples.length)parts.push('эталонов: '+S.kb.approvedSamples.length);mst.innerHTML='<span style="color:var(--green);font-weight:600">✓</span> '+parts.join(', ');}}var el=document.getElementById('kbEntries');if(!n){el.innerHTML='<div class="empty"><div class="empty-icon">🗂</div><p>База пуста</p></div>';return;}var items=[];S.kb.files.forEach(function(f,i){items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">📄</span><span class="file-name">'+f.name+'</span><span class="file-del" onclick="delFile('+i+')">✕</span></div>');});S.kb.snippets.forEach(function(s,i){items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">🌐</span><span class="file-name">'+s.url+'</span><span class="file-del" onclick="delSnip('+i+')">✕</span></div>');});if(S.kb.manual)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">✍️</span><span class="file-name">Tone of voice</span><span class="file-del" onclick="clearMan()">✕</span></div>');if(S.kb.examples)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">📝</span><span class="file-name">Примеры постов</span><span class="file-del" onclick="clearExamples()">✕</span></div>');if(S.kb.copyInstr)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">🎯</span><span class="file-name">Инструкции копирайтера</span><span class="file-del" onclick="clearCopyInstr()">✕</span></div>');if(S.kb.approvedSamples.length)items.push('<div class="file-item" style="margin-top:5px;background:var(--green-bg);border-color:var(--green-brd)"><span style="font-size:13px">🎓</span><span class="file-name" style="color:var(--green)">Эталоны стиля: '+S.kb.approvedSamples.length+' текстов</span><span class="file-del" onclick="clearApprovedSamples()">✕</span></div>');el.innerHTML=items.join('');}
 function delSnip(i){S.kb.snippets.splice(i,1);renderSnippets();updateKb();autoSave();}
 function kbCtx(){var p=[];if(S.kb.manual)p.push('=== ПРАВИЛА И TOV ===\n'+S.kb.manual);if(S.kb.examples)p.push('=== ПРИМЕРЫ ПОСТОВ ===\n'+S.kb.examples);S.kb.files.forEach(function(f){p.push('=== ДОКУМЕНТ: '+f.name+' ===\n'+f.text.slice(0,5000));});S.kb.snippets.forEach(function(s){p.push('=== САЙТ: '+s.url+' ===\n'+s.text.slice(0,2000));});return p.join('\n\n');}
 function withKb(msg){var kb=kbCtx();if(!kb)return msg;return'=== БАЗА ЗНАНИЙ ===\n'+kb+'\n\n=== ЗАДАНИЕ ===\n'+msg;}
