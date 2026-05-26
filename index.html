@@ -13,6 +13,7 @@
   --green:#21A038;--green-bg:rgba(33,160,56,.08);--green-brd:rgba(33,160,56,.25);
   --amber:#C8880A;--amber-bg:rgba(200,136,10,.08);--amber-brd:rgba(200,136,10,.25);
   --red:#D63B3B;--red-bg:rgba(214,59,59,.07);--red-brd:rgba(214,59,59,.22);
+  --tg:#229ED9;--tg-bg:rgba(34,158,217,.08);--tg-brd:rgba(34,158,217,.25);
   --t1:#111C17;--t2:#4A6454;--t3:#8AA090;--t4:#B8CCBE;
   --r:10px;--rs:7px;--rl:14px;
 }
@@ -67,6 +68,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--rs);font-size:12px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .1s;white-space:nowrap;font-family:inherit;line-height:1}
 .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
 .btn-primary:hover{background:var(--accent-d)}
+.btn-tg{background:var(--tg);color:#fff;border-color:var(--tg)}
+.btn-tg:hover{background:#1a8abf}
 .btn-default{background:transparent;color:var(--t2);border-color:var(--brd2)}
 .btn-default:hover{background:var(--surf2);color:var(--t1);border-color:var(--brd3)}
 .btn-ghost{background:transparent;color:var(--t2);border:none}
@@ -81,6 +84,22 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
 .card-title{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
 .card-desc{font-size:11px;color:var(--t3);margin:-8px 0 12px;line-height:1.55}
+
+/* ── Telegram card ── */
+.tg-card{background:var(--surf);border:1px solid var(--tg-brd);border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
+.tg-card .card-title{color:var(--tg)}
+.tg-post-item{background:var(--surf2);border:1px solid var(--brd);border-radius:var(--rs);padding:10px 12px;margin-top:7px;position:relative}
+.tg-post-meta{font-size:10px;color:var(--t3);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center}
+.tg-post-text{font-size:12px;color:var(--t1);line-height:1.6;white-space:pre-wrap;max-height:120px;overflow:hidden;position:relative}
+.tg-post-text.expanded{max-height:none}
+.tg-post-expand{font-size:10px;color:var(--tg);cursor:pointer;margin-top:4px;display:inline-block}
+.tg-post-actions{display:flex;gap:5px;margin-top:8px}
+.tg-channel-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--tg-bg);border:1px solid var(--tg-brd);border-radius:var(--rs);font-size:12px;margin-top:6px}
+.tg-channel-name{flex:1;font-weight:500;color:var(--tg)}
+.tg-channel-count{font-size:10px;color:var(--t3)}
+.tg-loading{text-align:center;padding:16px;font-size:12px;color:var(--t3)}
+.tg-error{font-size:11px;color:var(--red);margin-top:6px;padding:8px 10px;background:var(--red-bg);border-radius:var(--rs);border:1px solid var(--red-brd)}
+
 input[type=text],input[type=url],input[type=date],select,textarea{border:1px solid var(--brd2);border-radius:var(--rs);padding:7px 10px;font-size:12px;color:var(--t1);background:var(--surf2);font-family:inherit;transition:border-color .12s;width:100%}
 input[type=text]::placeholder,input[type=url]::placeholder,textarea::placeholder{color:var(--t3)}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);background:var(--surf)}
@@ -128,14 +147,11 @@ textarea{resize:vertical;line-height:1.6}
 .out-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .streaming-cursor{display:inline-block;width:2px;height:.9em;background:var(--accent);animation:blink .7s steps(1) infinite;vertical-align:text-bottom;margin-left:2px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-
-/* ── Prompt editor ── */
 .prompt-card{background:var(--surf);border:1px solid var(--amber-brd);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
 .prompt-card .card-title{color:var(--amber);margin-bottom:8px}
 .prompt-card textarea{font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;min-height:120px;background:var(--surf2)}
 .prompt-reset{font-size:10px;color:var(--t3);cursor:pointer;text-decoration:underline;margin-left:8px}
 .prompt-reset:hover{color:var(--red)}
-
 .plan-table-wrap{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
 .plan-table{width:100%;border-collapse:collapse;table-layout:fixed}
 .plan-table th{text-align:left;padding:9px 14px;font-size:9px;font-weight:600;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;background:var(--surf2);border-bottom:1px solid var(--brd)}
@@ -330,6 +346,20 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
       <input type="file" id="fi" multiple accept=".txt,.md,.pdf,.docx" style="display:none" onchange="loadFiles(this.files)">
       <div id="fileList"></div>
     </div>
+
+    <!-- ── Telegram-каналы ── -->
+    <div class="tg-card">
+      <div class="card-title">✈️ Telegram-каналы</div>
+      <div class="card-desc">Загружай посты из публичных каналов через RSS — агенты обучатся их стилю</div>
+      <div style="display:flex;gap:7px;margin-bottom:8px">
+        <input type="text" id="tgChannelInp" placeholder="@sberpremier или sberpremier" style="flex:1">
+        <button class="btn btn-tg btn-sm" onclick="loadTgChannel()" id="tgLoadBtn">Загрузить посты</button>
+      </div>
+      <div style="font-size:10px;color:var(--t3);margin-bottom:10px">Канал должен быть публичным. Работает через RSS-прокси.</div>
+      <div id="tgChannelList"></div>
+      <div id="tgPostsList"></div>
+    </div>
+
     <div class="card"><div class="card-title">Сайты Сбера</div>
       <div style="display:flex;gap:7px;margin-bottom:8px"><input type="url" id="urlInp" placeholder="https://sberbank.ru/…" style="flex:1"><button class="btn btn-primary btn-sm" onclick="addUrl()">Изучить</button></div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
@@ -433,14 +463,11 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
   </div>
 </div>
 
-<!-- Исследователь -->
+<!-- Агент-страницы -->
 <div class="page" id="page-researcher">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Исследователь</div><div class="ph-desc">Факты, кейсы и инсайты</div></div></div></div>
   <div class="ps">
-    <div class="prompt-card">
-      <div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('researcher')">сбросить</span></div>
-      <textarea id="prompt-researcher" rows="6" oninput="savePrompt('researcher')"></textarea>
-    </div>
+    <div class="prompt-card"><div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('researcher')">сбросить</span></div><textarea id="prompt-researcher" rows="6" oninput="savePrompt('researcher')"></textarea></div>
     <div class="agent-card" id="acard-researcher">
       <div class="agent-header"><div class="agent-ava ava-sky">🔍</div><div class="agent-info"><div class="agent-name">Исследователь</div><div class="agent-role">Факты · Кейсы · Инсайты</div></div><span class="agent-status st-idle" id="as-researcher">Ожидание</span></div>
       <div class="progress-row" id="pr-researcher" style="display:none"><span class="progress-label">Исследование</span><div class="progress-bar"><div class="progress-fill busy" id="pf-researcher" style="width:60%"></div></div><span class="progress-pct" id="pp-researcher">—</span></div>
@@ -451,14 +478,10 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
   </div>
 </div>
 
-<!-- Аналитик -->
 <div class="page" id="page-analyst">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Аналитик</div><div class="ph-desc">Цифры, статистика, крючки</div></div></div></div>
   <div class="ps">
-    <div class="prompt-card">
-      <div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('analyst')">сбросить</span></div>
-      <textarea id="prompt-analyst" rows="6" oninput="savePrompt('analyst')"></textarea>
-    </div>
+    <div class="prompt-card"><div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('analyst')">сбросить</span></div><textarea id="prompt-analyst" rows="6" oninput="savePrompt('analyst')"></textarea></div>
     <div class="agent-card" id="acard-analyst">
       <div class="agent-header"><div class="agent-ava ava-amber">📊</div><div class="agent-info"><div class="agent-name">Аналитик</div><div class="agent-role">Цифры · Статистика · Крючки</div></div><span class="agent-status st-idle" id="as-analyst">Ожидание</span></div>
       <div class="progress-row" id="pr-analyst" style="display:none"><span class="progress-label">Анализ</span><div class="progress-bar"><div class="progress-fill busy" id="pf-analyst" style="width:45%"></div></div><span class="progress-pct" id="pp-analyst">—</span></div>
@@ -469,14 +492,10 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
   </div>
 </div>
 
-<!-- Копирайтер -->
 <div class="page" id="page-copy">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Копирайтер</div><div class="ph-desc">Тексты под каждый канал</div></div></div></div>
   <div class="ps">
-    <div class="prompt-card">
-      <div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('copy')">сбросить</span></div>
-      <textarea id="prompt-copy" rows="8" oninput="savePrompt('copy')"></textarea>
-    </div>
+    <div class="prompt-card"><div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('copy')">сбросить</span></div><textarea id="prompt-copy" rows="8" oninput="savePrompt('copy')"></textarea></div>
     <div class="agent-card" id="acard-copy">
       <div class="agent-header"><div class="agent-ava ava-purple">✍️</div><div class="agent-info"><div class="agent-name">Копирайтер</div><div class="agent-role">Тексты под каждый канал</div></div><span class="agent-status st-idle" id="as-copy">Ожидание</span></div>
       <div class="progress-row" id="pr-copy" style="display:none"><span class="progress-label">Написание</span><div class="progress-bar"><div class="progress-fill busy" id="pf-copy" style="width:50%"></div></div><span class="progress-pct" id="pp-copy">—</span></div>
@@ -488,14 +507,10 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
   </div>
 </div>
 
-<!-- Визуалист -->
 <div class="page" id="page-visual">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Визуалист</div><div class="ph-desc">Концепции и промпты для изображений</div></div></div></div>
   <div class="ps">
-    <div class="prompt-card">
-      <div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('visual')">сбросить</span></div>
-      <textarea id="prompt-visual" rows="6" oninput="savePrompt('visual')"></textarea>
-    </div>
+    <div class="prompt-card"><div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('visual')">сбросить</span></div><textarea id="prompt-visual" rows="6" oninput="savePrompt('visual')"></textarea></div>
     <div class="agent-card" id="acard-visual">
       <div class="agent-header"><div class="agent-ava ava-teal">🎨</div><div class="agent-info"><div class="agent-name">Визуалист</div><div class="agent-role">Концепции и промпты</div></div><span class="agent-status st-idle" id="as-visual">Ожидание</span></div>
       <div class="card-title">Результат</div>
@@ -505,14 +520,10 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
   </div>
 </div>
 
-<!-- Факт-чекер -->
 <div class="page" id="page-factcheck">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Факт-чекер</div><div class="ph-desc">Проверка достоверности и юридической чистоты</div></div></div></div>
   <div class="ps">
-    <div class="prompt-card">
-      <div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('factcheck')">сбросить</span></div>
-      <textarea id="prompt-factcheck" rows="8" oninput="savePrompt('factcheck')"></textarea>
-    </div>
+    <div class="prompt-card"><div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('factcheck')">сбросить</span></div><textarea id="prompt-factcheck" rows="8" oninput="savePrompt('factcheck')"></textarea></div>
     <div class="agent-card" id="acard-factcheck">
       <div class="agent-header"><div class="agent-ava ava-red">🔎</div><div class="agent-info"><div class="agent-name">Факт-чекер</div><div class="agent-role">Проверка · Юр. чистота</div></div><span class="agent-status st-idle" id="as-factcheck">Ожидание</span></div>
       <div class="card-title">Заключение</div>
@@ -522,14 +533,10 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
   </div>
 </div>
 
-<!-- Редактор -->
 <div class="page" id="page-editor">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Редактор</div><div class="ph-desc">Грамматика, TOV, юридическая чистота</div></div></div></div>
   <div class="ps">
-    <div class="prompt-card">
-      <div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('editor')">сбросить</span></div>
-      <textarea id="prompt-editor" rows="6" oninput="savePrompt('editor')"></textarea>
-    </div>
+    <div class="prompt-card"><div class="card-title">Системный промпт <span class="prompt-reset" onclick="resetPrompt('editor')">сбросить</span></div><textarea id="prompt-editor" rows="6" oninput="savePrompt('editor')"></textarea></div>
     <div class="agent-card" id="acard-editor">
       <div class="agent-header"><div class="agent-ava ava-green">✅</div><div class="agent-info"><div class="agent-name">Редактор</div><div class="agent-role">Грамматика · TOV · Юр. чистота</div></div><span class="agent-status st-idle" id="as-editor">Ожидание</span></div>
       <div class="card-title">Заключение</div>
@@ -540,18 +547,15 @@ details summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--accent
   </div>
 </div>
 
-<!-- Согласование -->
 <div class="page" id="page-approval">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Финальное согласование</div><div class="ph-desc">Проверь материалы и прими решение</div></div></div></div>
   <div class="ps" id="apprPage"><div class="empty"><div class="empty-icon">🖊</div><p>Здесь появятся материалы, готовые к согласованию</p></div></div>
 </div>
 
-<!-- Результаты -->
 <div class="page" id="page-results">
   <div class="ph"><div class="ph-top"><div><div class="ph-title">Архив результатов</div><div class="ph-desc">Одобренные и выполненные задачи</div></div></div></div>
   <div class="ps" id="resPage"><div class="empty"><div class="empty-icon">📦</div><p>Выполненные задачи появятся здесь</p></div></div>
 </div>
-
 </main>
 </div>
 
@@ -601,10 +605,201 @@ var API='https://api.anthropic.com/v1/messages';
 var MDL='claude-sonnet-4-6';
 var CM={tg:'TG',sms:'SMS',push:'Push',site:'Сайт'};
 var TM={post:'Пост',sms:'SMS/Push',article:'Статья',banner:'Баннер',research:'Исследование'};
-var S={apiKey:'',kb:{files:[],snippets:[],manual:'',examples:'',copyInstr:'',approvedSamples:[]},plan:[],nid:1,running:false,results:[]};
+var S={apiKey:'',kb:{files:[],snippets:[],manual:'',examples:'',copyInstr:'',approvedSamples:[],tgChannels:[]},plan:[],nid:1,running:false,results:[]};
 var chatHistory=[];
 
-/* ── Default prompts ── */
+/* ══════════════════════════════════════════
+   TELEGRAM RSS LOADER
+══════════════════════════════════════════ */
+
+// RSS-прокси — пробуем по очереди
+var RSS_PROXIES=[
+  function(ch){return'https://rsshub.app/telegram/channel/'+ch;},
+  function(ch){return'https://rss.app/feeds/telegram/'+ch+'.xml';},
+  function(ch){return'https://fetchrss.com/rss/telegram/'+ch+'.xml';}
+];
+
+// CORS-прокси для обхода ограничений
+var CORS_PROXIES=[
+  function(url){return'https://api.allorigins.win/raw?url='+encodeURIComponent(url);},
+  function(url){return'https://corsproxy.io/?'+encodeURIComponent(url);},
+  function(url){return'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(url);}
+];
+
+async function fetchRss(url){
+  // Сначала без прокси
+  try{
+    var r=await fetch(url,{signal:AbortSignal.timeout(6000)});
+    if(r.ok){var t=await r.text();if(t.includes('<rss')||t.includes('<feed'))return t;}
+  }catch(e){}
+  // С CORS-прокси
+  for(var i=0;i<CORS_PROXIES.length;i++){
+    try{
+      var u=CORS_PROXIES[i](url);
+      var r=await fetch(u,{signal:AbortSignal.timeout(8000)});
+      if(r.ok){var t=await r.text();if(t.includes('<rss')||t.includes('<feed')||t.length>200)return t;}
+    }catch(e){}
+  }
+  return null;
+}
+
+function parseRssItems(xml){
+  var items=[];
+  try{
+    var parser=new DOMParser();
+    var doc=parser.parseFromString(xml,'text/xml');
+    var nodes=doc.querySelectorAll('item, entry');
+    nodes.forEach(function(node){
+      var title=node.querySelector('title');
+      var desc=node.querySelector('description, content\\:encoded, content, summary');
+      var pubDate=node.querySelector('pubDate, published, updated');
+      var raw=(desc?desc.textContent:'')||(title?title.textContent:'');
+      // Убираем HTML-теги
+      var text=raw.replace(/<[^>]+>/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
+      if(text&&text.length>20){
+        items.push({
+          text:text,
+          date:pubDate?pubDate.textContent.trim():''
+        });
+      }
+    });
+  }catch(e){}
+  return items;
+}
+
+async function loadTgChannel(){
+  var inp=document.getElementById('tgChannelInp');
+  var raw=inp.value.trim().replace(/^@/,'').replace(/^https?:\/\/t\.me\//,'').replace(/\//g,'');
+  if(!raw){alert('Введи @username или название канала');return;}
+
+  var btn=document.getElementById('tgLoadBtn');
+  btn.disabled=true;btn.textContent='Загружаю…';
+  var postsDiv=document.getElementById('tgPostsList');
+  postsDiv.innerHTML='<div class="tg-loading">⏳ Подключаюсь к каналу @'+raw+'…</div>';
+
+  var items=null;
+  var usedProxy='';
+
+  for(var pi=0;pi<RSS_PROXIES.length;pi++){
+    var rssUrl=RSS_PROXIES[pi](raw);
+    postsDiv.innerHTML='<div class="tg-loading">⏳ Пробую источник '+(pi+1)+'/'+RSS_PROXIES.length+'…</div>';
+    var xml=await fetchRss(rssUrl);
+    if(xml){
+      items=parseRssItems(xml);
+      if(items.length>0){usedProxy=rssUrl;break;}
+    }
+  }
+
+  btn.disabled=false;btn.textContent='Загрузить посты';
+
+  if(!items||items.length===0){
+    postsDiv.innerHTML='<div class="tg-error">Не удалось загрузить посты канала @'+raw+'.<br>Убедись, что канал публичный и имя написано правильно.<br><br>Если не работает — скопируй посты вручную в поле «Примеры постов» ниже.</div>';
+    return;
+  }
+
+  // Показываем посты для выбора
+  renderTgPosts(raw,items.slice(0,20));
+}
+
+function renderTgPosts(channelName,items){
+  var div=document.getElementById('tgPostsList');
+  var html='<div style="margin-top:10px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+  html+='<div style="font-size:11px;font-weight:600;color:var(--tg)">📋 @'+channelName+' · '+items.length+' постов</div>';
+  html+='<div style="display:flex;gap:5px">';
+  html+='<button class="btn btn-xs" style="background:var(--tg-bg);color:var(--tg);border:1px solid var(--tg-brd)" onclick="tgSelectAll(true)">Выбрать все</button>';
+  html+='<button class="btn btn-xs btn-default" onclick="tgSelectAll(false)">Снять</button>';
+  html+='<button class="btn btn-xs btn-tg" onclick="tgAddSelected(\''+channelName+'\')">✓ Добавить выбранные</button>';
+  html+='</div></div>';
+
+  items.forEach(function(item,i){
+    var short=item.text.slice(0,180);
+    var hasMore=item.text.length>180;
+    html+='<div class="tg-post-item">';
+    html+='<div class="tg-post-meta">';
+    html+='<label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" class="tg-post-cb" data-idx="'+i+'" checked> <span style="font-weight:500;color:var(--t1)">Пост '+(i+1)+'</span></label>';
+    html+='<span>'+formatTgDate(item.date)+'</span>';
+    html+='</div>';
+    html+='<div class="tg-post-text" id="tg-text-'+i+'">'+esc(short)+(hasMore?'':'')+'</div>';
+    if(hasMore)html+='<span class="tg-post-expand" onclick="expandTgPost('+i+',\''+esc(item.text.replace(/'/g,"&#39;"))+'\')">Показать полностью…</span>';
+    html+='</div>';
+  });
+  html+='</div>';
+  div.innerHTML=html;
+
+  // Сохраняем тексты для последующего добавления
+  window._tgPostsCache=items;
+}
+
+function formatTgDate(d){if(!d)return'';try{return new Date(d).toLocaleDateString('ru-RU',{day:'numeric',month:'short'});}catch(e){return'';}}
+
+function expandTgPost(idx,fullText){
+  var el=document.getElementById('tg-text-'+idx);
+  if(el){el.textContent=fullText;el.classList.add('expanded');}
+  var btn=el.nextElementSibling;if(btn&&btn.classList.contains('tg-post-expand'))btn.remove();
+}
+
+function tgSelectAll(sel){
+  document.querySelectorAll('.tg-post-cb').forEach(function(cb){cb.checked=sel;});
+}
+
+function tgAddSelected(channelName){
+  var cbs=document.querySelectorAll('.tg-post-cb');
+  var selected=[];
+  cbs.forEach(function(cb){
+    if(cb.checked){
+      var idx=parseInt(cb.dataset.idx);
+      if(window._tgPostsCache&&window._tgPostsCache[idx])selected.push(window._tgPostsCache[idx].text);
+    }
+  });
+  if(!selected.length){alert('Выбери хотя бы один пост');return;}
+
+  // Добавляем в «Примеры постов»
+  var existing=document.getElementById('examplesInp').value.trim();
+  var newPosts=selected.map(function(t,i){return'Пример из @'+channelName+':\n'+t;}).join('\n\n---\n\n');
+  var combined=existing?(existing+'\n\n---\n\n'+newPosts):newPosts;
+  document.getElementById('examplesInp').value=combined;
+  S.kb.examples=combined;
+
+  // Также сохраняем канал в список
+  if(!S.kb.tgChannels)S.kb.tgChannels=[];
+  if(!S.kb.tgChannels.find(function(c){return c.name===channelName;})){
+    S.kb.tgChannels.push({name:channelName,count:selected.length,date:new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short'})});
+  }
+  renderTgChannels();
+  updateKb();
+  autoSave();
+
+  // Уведомление
+  document.getElementById('tgPostsList').innerHTML='<div style="background:var(--green-bg);border:1px solid var(--green-brd);border-radius:var(--rs);padding:10px 13px;font-size:12px;color:var(--green);margin-top:8px">✓ Добавлено '+selected.length+' постов из @'+channelName+' в примеры стиля</div>';
+  document.getElementById('exSt').textContent='Сохранено';
+  setTimeout(function(){document.getElementById('exSt').textContent='';},2000);
+}
+
+function renderTgChannels(){
+  var div=document.getElementById('tgChannelList');
+  if(!div)return;
+  var channels=S.kb.tgChannels||[];
+  if(!channels.length){div.innerHTML='';return;}
+  div.innerHTML=channels.map(function(c,i){
+    return '<div class="tg-channel-item">'
+      +'<span style="font-size:16px">✈️</span>'
+      +'<span class="tg-channel-name">@'+c.name+'</span>'
+      +'<span class="tg-channel-count">'+c.count+' постов · '+c.date+'</span>'
+      +'<span class="file-del" onclick="delTgChannel('+i+')">✕</span>'
+      +'</div>';
+  }).join('');
+}
+
+function delTgChannel(i){
+  S.kb.tgChannels.splice(i,1);
+  renderTgChannels();
+  autoSave();
+}
+
+/* ══════════════════════════════════════════
+   DEFAULT PROMPTS
+══════════════════════════════════════════ */
 var DEFAULT_PROMPTS={
   researcher:'Ты — Исследователь СберПремьер.\nФОРМАТ:\n📌 КЛЮЧЕВЫЕ ФАКТЫ (3-5)\n💬 РЕАЛЬНЫЕ КЕЙСЫ\n🔍 ИНСАЙТЫ\nОтвечай конкретно.',
   analyst:'Ты — Аналитик СберПремьер.\nФОРМАТ:\n📊 КЛЮЧЕВЫЕ ЦИФРЫ (3-5)\n🏆 КОНТЕКСТ\n💡 КРЮЧКИ ДЛЯ ТЕКСТА',
@@ -614,25 +809,9 @@ var DEFAULT_PROMPTS={
   editor:'Ты — Главный редактор СберПремьер.\nЧЕКЛИСТ: 1.ГРАММАТИКА 2.СТИЛЬ/TOV 3.СТРУКТУРА 4.CTA 5.КАНАЛ\nФОРМАТ: summary → чеклист (✅/⚠️/❌) → ВЕРДИКТ: ОДОБРЕНО или ТРЕБУЕТ ДОРАБОТКИ'
 };
 var customPrompts={};
-
-function savePrompt(id){
-  customPrompts[id]=document.getElementById('prompt-'+id).value;
-  try{localStorage.setItem('sp_prompts',JSON.stringify(customPrompts));}catch(e){}
-}
-function resetPrompt(id){
-  customPrompts[id]=DEFAULT_PROMPTS[id];
-  document.getElementById('prompt-'+id).value=DEFAULT_PROMPTS[id];
-  try{localStorage.setItem('sp_prompts',JSON.stringify(customPrompts));}catch(e){}
-}
-function loadPrompts(){
-  try{var raw=localStorage.getItem('sp_prompts');if(raw)customPrompts=JSON.parse(raw);}catch(e){}
-  Object.keys(DEFAULT_PROMPTS).forEach(function(id){
-    var val=customPrompts[id]||DEFAULT_PROMPTS[id];
-    customPrompts[id]=val;
-    var el=document.getElementById('prompt-'+id);
-    if(el)el.value=val;
-  });
-}
+function savePrompt(id){customPrompts[id]=document.getElementById('prompt-'+id).value;try{localStorage.setItem('sp_prompts',JSON.stringify(customPrompts));}catch(e){}}
+function resetPrompt(id){customPrompts[id]=DEFAULT_PROMPTS[id];document.getElementById('prompt-'+id).value=DEFAULT_PROMPTS[id];try{localStorage.setItem('sp_prompts',JSON.stringify(customPrompts));}catch(e){}}
+function loadPrompts(){try{var raw=localStorage.getItem('sp_prompts');if(raw)customPrompts=JSON.parse(raw);}catch(e){}Object.keys(DEFAULT_PROMPTS).forEach(function(id){var val=customPrompts[id]||DEFAULT_PROMPTS[id];customPrompts[id]=val;var el=document.getElementById('prompt-'+id);if(el)el.value=val;});}
 function getPrompt(id){return customPrompts[id]||DEFAULT_PROMPTS[id];}
 
 var SBER_KNOWLEDGE={
@@ -641,9 +820,9 @@ var SBER_KNOWLEDGE={
   'https://www.sberbank.ru/ru/person/premier/privileges':'Привилегии СберПремьер: доступ в бизнес-залы аэропортов по карте Priority Pass (более 1300 залов по миру), страховка для путешественников, бесплатные переводы и конвертация валюты по выгодному курсу, кешбэк до 10% в ресторанах и travel-категориях.'
 };
 
-var LS='sberpremier_v7';
-function lsSave(){try{var d={apiKey:S.apiKey,kb:{manual:S.kb.manual,examples:S.kb.examples,snippets:S.kb.snippets,copyInstr:S.kb.copyInstr,approvedSamples:S.kb.approvedSamples},plan:S.plan.map(function(r){var c=Object.assign({},r);if(c.result)c.result=Object.assign({},c.result,{imageUrl:undefined});return c;}),nid:S.nid,results:S.results.map(function(r){var c=Object.assign({},r);if(c.result)c.result=Object.assign({},c.result,{imageUrl:undefined});return c;})};localStorage.setItem(LS,JSON.stringify(d));showSaveFlash();}catch(e){}}
-function lsLoad(){try{var raw=localStorage.getItem(LS);if(!raw)return;var d=JSON.parse(raw);if(d.apiKey){S.apiKey=d.apiKey;showKeyStatus();}if(d.kb){if(d.kb.manual){S.kb.manual=d.kb.manual;document.getElementById('manInp').value=d.kb.manual;}if(d.kb.examples){S.kb.examples=d.kb.examples;document.getElementById('examplesInp').value=d.kb.examples;}if(d.kb.snippets)S.kb.snippets=d.kb.snippets;if(d.kb.copyInstr){S.kb.copyInstr=d.kb.copyInstr;document.getElementById('copyInstrInp').value=d.kb.copyInstr;}if(d.kb.approvedSamples)S.kb.approvedSamples=d.kb.approvedSamples;renderSnippets();updateKb();renderApprovedSamples();}if(d.plan){S.plan=d.plan;S.nid=d.nid||S.plan.length+1;}if(d.results)S.results=d.results;renderPlan();updBadge();renderResults();}catch(e){}}
+var LS='sberpremier_v8';
+function lsSave(){try{var d={apiKey:S.apiKey,kb:{manual:S.kb.manual,examples:S.kb.examples,snippets:S.kb.snippets,copyInstr:S.kb.copyInstr,approvedSamples:S.kb.approvedSamples,tgChannels:S.kb.tgChannels||[]},plan:S.plan.map(function(r){var c=Object.assign({},r);if(c.result)c.result=Object.assign({},c.result,{imageUrl:undefined});return c;}),nid:S.nid,results:S.results.map(function(r){var c=Object.assign({},r);if(c.result)c.result=Object.assign({},c.result,{imageUrl:undefined});return c;})};localStorage.setItem(LS,JSON.stringify(d));showSaveFlash();}catch(e){}}
+function lsLoad(){try{var raw=localStorage.getItem(LS);if(!raw)return;var d=JSON.parse(raw);if(d.apiKey){S.apiKey=d.apiKey;showKeyStatus();}if(d.kb){if(d.kb.manual){S.kb.manual=d.kb.manual;document.getElementById('manInp').value=d.kb.manual;}if(d.kb.examples){S.kb.examples=d.kb.examples;document.getElementById('examplesInp').value=d.kb.examples;}if(d.kb.snippets)S.kb.snippets=d.kb.snippets;if(d.kb.copyInstr){S.kb.copyInstr=d.kb.copyInstr;document.getElementById('copyInstrInp').value=d.kb.copyInstr;}if(d.kb.approvedSamples)S.kb.approvedSamples=d.kb.approvedSamples;if(d.kb.tgChannels)S.kb.tgChannels=d.kb.tgChannels;renderSnippets();updateKb();renderApprovedSamples();renderTgChannels();}if(d.plan){S.plan=d.plan;S.nid=d.nid||S.plan.length+1;}if(d.results)S.results=d.results;renderPlan();updBadge();renderResults();}catch(e){}}
 var _st=null;function autoSave(){clearTimeout(_st);_st=setTimeout(lsSave,700);}
 function showSaveFlash(){var b=document.getElementById('saveBadge');b.style.display='inline-block';clearTimeout(b._t);b._t=setTimeout(function(){b.style.display='none';},2000);}
 function saveKey(){var k=document.getElementById('keyInp').value.trim();if(!k){alert('Введи API ключ');return;}S.apiKey=k;document.getElementById('keyInp').value='';showKeyStatus();lsSave();}
@@ -673,7 +852,26 @@ function renderApprovedSamples(){var list=document.getElementById('approvedSampl
 function removeApprovedSample(i){S.kb.approvedSamples.splice(i,1);renderApprovedSamples();updateKb();autoSave();}
 function clearApprovedSamples(){if(confirm('Очистить всю базу стилей?')){S.kb.approvedSamples=[];renderApprovedSamples();updateKb();autoSave();}}
 function approvedCtx(){if(!S.kb.approvedSamples.length)return'';return'=== ОДОБРЕННЫЕ ТЕКСТЫ (ЭТАЛОН СТИЛЯ) ===\n'+S.kb.approvedSamples.map(function(s,i){return'[Эталон '+(i+1)+'] «'+s.topic+'»:\n'+s.text;}).join('\n\n');}
-function updateKb(){var n=S.kb.files.length+S.kb.snippets.length+(S.kb.manual?1:0)+(S.kb.examples?1:0)+(S.kb.copyInstr?1:0)+(S.kb.approvedSamples.length?1:0);document.getElementById('kbCount').textContent=n;document.getElementById('kbBadge').textContent=n?'База: '+n+' ист.':'База: пусто';document.getElementById('kbBadge').className='pill '+(n?'pill-green':'pill-muted');dot('kb',n?'done':'');var mst=document.getElementById('mgr-kb-status');if(mst){if(!n){mst.textContent='Нет данных';mst.style.color='var(--t3)';}else{var parts=[];if(S.kb.files.length)parts.push(S.kb.files.length+' файл(а)');if(S.kb.snippets.length)parts.push(S.kb.snippets.length+' сайт(а)');if(S.kb.manual)parts.push('TOV');if(S.kb.examples)parts.push('примеры');if(S.kb.copyInstr)parts.push('инструкции');if(S.kb.approvedSamples.length)parts.push('эталонов: '+S.kb.approvedSamples.length);mst.innerHTML='<span style="color:var(--green);font-weight:600">✓</span> '+parts.join(', ');}}var el=document.getElementById('kbEntries');if(!n){el.innerHTML='<div class="empty"><div class="empty-icon">🗂</div><p>База пуста</p></div>';return;}var items=[];S.kb.files.forEach(function(f,i){items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">📄</span><span class="file-name">'+f.name+'</span><span class="file-del" onclick="delFile('+i+')">✕</span></div>');});S.kb.snippets.forEach(function(s,i){items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">🌐</span><span class="file-name">'+s.url+'</span><span class="file-del" onclick="delSnip('+i+')">✕</span></div>');});if(S.kb.manual)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">✍️</span><span class="file-name">Tone of voice</span><span class="file-del" onclick="clearMan()">✕</span></div>');if(S.kb.examples)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">📝</span><span class="file-name">Примеры постов</span><span class="file-del" onclick="clearExamples()">✕</span></div>');if(S.kb.copyInstr)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">🎯</span><span class="file-name">Инструкции копирайтера</span><span class="file-del" onclick="clearCopyInstr()">✕</span></div>');if(S.kb.approvedSamples.length)items.push('<div class="file-item" style="margin-top:5px;background:var(--green-bg);border-color:var(--green-brd)"><span style="font-size:13px">🎓</span><span class="file-name" style="color:var(--green)">Эталоны стиля: '+S.kb.approvedSamples.length+' текстов</span><span class="file-del" onclick="clearApprovedSamples()">✕</span></div>');el.innerHTML=items.join('');}
+function updateKb(){
+  var n=S.kb.files.length+S.kb.snippets.length+(S.kb.manual?1:0)+(S.kb.examples?1:0)+(S.kb.copyInstr?1:0)+(S.kb.approvedSamples.length?1:0)+((S.kb.tgChannels&&S.kb.tgChannels.length)?1:0);
+  document.getElementById('kbCount').textContent=n;
+  document.getElementById('kbBadge').textContent=n?'База: '+n+' ист.':'База: пусто';
+  document.getElementById('kbBadge').className='pill '+(n?'pill-green':'pill-muted');
+  dot('kb',n?'done':'');
+  var mst=document.getElementById('mgr-kb-status');
+  if(mst){if(!n){mst.textContent='Нет данных';mst.style.color='var(--t3)';}else{var parts=[];if(S.kb.files.length)parts.push(S.kb.files.length+' файл(а)');if(S.kb.snippets.length)parts.push(S.kb.snippets.length+' сайт(а)');if(S.kb.tgChannels&&S.kb.tgChannels.length)parts.push('TG: '+S.kb.tgChannels.map(function(c){return'@'+c.name;}).join(', '));if(S.kb.manual)parts.push('TOV');if(S.kb.examples)parts.push('примеры');if(S.kb.copyInstr)parts.push('инструкции');if(S.kb.approvedSamples.length)parts.push('эталонов: '+S.kb.approvedSamples.length);mst.innerHTML='<span style="color:var(--green);font-weight:600">✓</span> '+parts.join(', ');}}
+  var el=document.getElementById('kbEntries');
+  if(!n){el.innerHTML='<div class="empty"><div class="empty-icon">🗂</div><p>База пуста</p></div>';return;}
+  var items=[];
+  S.kb.files.forEach(function(f,i){items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">📄</span><span class="file-name">'+f.name+'</span><span class="file-del" onclick="delFile('+i+')">✕</span></div>');});
+  S.kb.snippets.forEach(function(s,i){items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">🌐</span><span class="file-name">'+s.url+'</span><span class="file-del" onclick="delSnip('+i+')">✕</span></div>');});
+  if(S.kb.tgChannels&&S.kb.tgChannels.length)S.kb.tgChannels.forEach(function(c,i){items.push('<div class="file-item" style="margin-top:5px;background:var(--tg-bg);border-color:var(--tg-brd)"><span style="font-size:13px">✈️</span><span class="file-name" style="color:var(--tg)">@'+c.name+' · '+c.count+' постов</span><span class="file-del" onclick="delTgChannel('+i+')">✕</span></div>');});
+  if(S.kb.manual)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">✍️</span><span class="file-name">Tone of voice</span><span class="file-del" onclick="clearMan()">✕</span></div>');
+  if(S.kb.examples)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">📝</span><span class="file-name">Примеры постов</span><span class="file-del" onclick="clearExamples()">✕</span></div>');
+  if(S.kb.copyInstr)items.push('<div class="file-item" style="margin-top:5px"><span style="font-size:13px">🎯</span><span class="file-name">Инструкции копирайтера</span><span class="file-del" onclick="clearCopyInstr()">✕</span></div>');
+  if(S.kb.approvedSamples.length)items.push('<div class="file-item" style="margin-top:5px;background:var(--green-bg);border-color:var(--green-brd)"><span style="font-size:13px">🎓</span><span class="file-name" style="color:var(--green)">Эталоны стиля: '+S.kb.approvedSamples.length+' текстов</span><span class="file-del" onclick="clearApprovedSamples()">✕</span></div>');
+  el.innerHTML=items.join('');
+}
 function delSnip(i){S.kb.snippets.splice(i,1);renderSnippets();updateKb();autoSave();}
 function kbCtx(){var p=[];if(S.kb.manual)p.push('=== ПРАВИЛА И TOV ===\n'+S.kb.manual);if(S.kb.examples)p.push('=== ПРИМЕРЫ ПОСТОВ ===\n'+S.kb.examples);S.kb.files.forEach(function(f){p.push('=== ДОКУМЕНТ: '+f.name+' ===\n'+f.text.slice(0,5000));});S.kb.snippets.forEach(function(s){p.push('=== САЙТ: '+s.url+' ===\n'+s.text.slice(0,2000));});return p.join('\n\n');}
 function withKb(msg){var kb=kbCtx();if(!kb)return msg;return'=== БАЗА ЗНАНИЙ ===\n'+kb+'\n\n=== ЗАДАНИЕ ===\n'+msg;}
@@ -707,83 +905,9 @@ function wzSave(){if(WZ.step===1){var f=document.getElementById('wz-from'),t=doc
 function wzNext(){if(wzSave()){WZ.step++;renderWizard();}}
 function wzPrev(){WZ.step--;renderWizard();}
 async function wzGenerate(){if(!S.apiKey){alert('Введи API ключ');return;}document.getElementById('pwBody').innerHTML='<div style="text-align:center;padding:32px 0"><div class="wiz-spinner"></div><div style="font-size:13px;font-weight:600;color:var(--t1)">AI генерирует план…</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Несколько секунд</div></div>';document.getElementById('pwFoot').innerHTML='';var fm={'1':1,'2':2,'3':3,'5':7};var step=fm[WZ.freq]||2;var dates=[];var cur=new Date(WZ.dateFrom+'T00:00:00');var end=new Date(WZ.dateTo+'T00:00:00');while(cur<=end&&dates.length<20){dates.push(cur.toISOString().slice(0,10));cur.setDate(cur.getDate()+step);}var ti='';if(WZ.topicRows.length){ti='\nДля задач используй:\n';WZ.topicRows.forEach(function(row){var tl=ALL_TOPICS.find(function(t){return t.v===row.topic;});ti+='- Тема "'+(tl?tl.l.replace(/[^\w\sа-яёА-ЯЁ]/g,'').trim():row.topic)+'": type='+row.type+'\n';});}var cs=JSON.stringify(WZ.channels.length?WZ.channels:['tg']);var at=WZ.topicRows.length?WZ.topicRows.map(function(r){return r.type;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join('|'):'post|sms|article|banner|research';var sys='Ты контент-стратег СберПремьер. ТОЛЬКО JSON-массив без markdown.\nФормат: [{"date":"YYYY-MM-DD","topic":"конкретная тема","type":"'+at+'","channels":'+cs+'}]';var prompt='Контент-план СберПремьер. Даты: '+dates.join(', ')+'.\n'+ti+(WZ.extraNotes?'Акценты: '+WZ.extraNotes+'.\n':'')+'Задач: '+dates.length+'. Темы конкретные, разнообразные.';try{var res=await callAI(sys,withKb(prompt));var items=JSON.parse(res.replace(/```json|```/g,'').trim());var added=0;items.forEach(function(it){S.plan.push({id:S.nid++,date:it.date,topic:it.topic,type:it.type||'post',channels:it.channels||WZ.channels||['tg'],notes:'',status:'todo',result:null});added++;});renderPlan();updBadge();dot('plan','done');hideWizard();document.getElementById('execWrap').style.display='block';elog('✦ AI-план: '+added+' задач на '+fmtD(WZ.dateFrom)+' — '+fmtD(WZ.dateTo),'log-green');autoSave();}catch(e){document.getElementById('pwBody').innerHTML='<div style="text-align:center;padding:24px;color:var(--red)">Ошибка: '+esc(e.message)+'</div>';document.getElementById('pwFoot').innerHTML='<button class="btn btn-default" onclick="hideWizard()">Закрыть</button><button class="btn btn-primary" onclick="wzGenerate()">Повторить</button>';}}
-
-function buildCopyPrompt(channels,type){
-  var base=getPrompt('copy');
-  var rules=[];
-  if(channels.indexOf('tg')>=0){if(type==='research')rules.push('TELEGRAM (исследование): 400-600 символов, структура с цифрами, заголовок + 3-4 абзаца');else rules.push('TELEGRAM: 150-300 символов, зачин + 2-3 выгоды с эмодзи + CTA, живой тон');}
-  if(channels.indexOf('sms')>=0)rules.push('SMS: строго до 160 символов, суть + выгода + CTA, без эмодзи');
-  if(channels.indexOf('push')>=0)rules.push('PUSH: заголовок до 50 символов + текст до 100 символов, конкретная выгода');
-  if(channels.indexOf('site')>=0){if(type==='article')rules.push('СТАТЬЯ: 600-900 символов, H1 + введение + 3 раздела + итог + CTA');else if(type==='banner')rules.push('БАННЕР: заголовок 4-7 слов + подзаголовок + кнопка 2-4 слова');else rules.push('ВЕБ: 300-500 символов, выгоды + CTA');}
-  var p=base+'\n\nКАНАЛЫ ДЛЯ ЭТОЙ ЗАДАЧИ:\n'+rules.map(function(r){return'• '+r;}).join('\n');
-  if(S.kb.copyInstr)p+='\n\n=== ИНСТРУКЦИИ (СТРОГО) ===\n'+S.kb.copyInstr;
-  var s=approvedCtx();if(s)p+='\n\n'+s;
-  return p;
-}
-
+function buildCopyPrompt(channels,type){var base=getPrompt('copy');var rules=[];if(channels.indexOf('tg')>=0){if(type==='research')rules.push('TELEGRAM (исследование): 400-600 символов, структура с цифрами, заголовок + 3-4 абзаца');else rules.push('TELEGRAM: 150-300 символов, зачин + 2-3 выгоды с эмодзи + CTA, живой тон');}if(channels.indexOf('sms')>=0)rules.push('SMS: строго до 160 символов, суть + выгода + CTA, без эмодзи');if(channels.indexOf('push')>=0)rules.push('PUSH: заголовок до 50 символов + текст до 100 символов, конкретная выгода');if(channels.indexOf('site')>=0){if(type==='article')rules.push('СТАТЬЯ: 600-900 символов, H1 + введение + 3 раздела + итог + CTA');else if(type==='banner')rules.push('БАННЕР: заголовок 4-7 слов + подзаголовок + кнопка 2-4 слова');else rules.push('ВЕБ: 300-500 символов, выгоды + CTA');}var p=base+'\n\nКАНАЛЫ ДЛЯ ЭТОЙ ЗАДАЧИ:\n'+rules.map(function(r){return'• '+r;}).join('\n');if(S.kb.copyInstr)p+='\n\n=== ИНСТРУКЦИИ (СТРОГО) ===\n'+S.kb.copyInstr;var s=approvedCtx();if(s)p+='\n\n'+s;return p;}
 async function runAll(){var pending=S.plan.filter(function(r){return r.status==='todo';});if(!pending.length){alert('Нет задач');return;}document.getElementById('runAllBtn').disabled=true;for(var i=0;i<pending.length;i++){if(i>0){elog('⏳ Пауза…','log-blue');await new Promise(function(r){setTimeout(r,1000);});}await runOne(pending[i].id);}document.getElementById('runAllBtn').disabled=false;}
-async function runOne(id){
-  var row=S.plan.find(function(r){return r.id===id;});if(!row||S.running)return;
-  S.running=true;document.getElementById('execWrap').style.display='block';renderPlan();
-  var brief='Задача: '+row.topic+'\nТип: '+(TM[row.type]||row.type)+'\nКаналы: '+row.channels.map(function(c){return CM[c];}).join(', ')+'\nДата: '+fmtD(row.date)+(row.notes?'\nПримечания: '+row.notes:'');
-  setSt(id,'inprog');elog('▶ «'+row.topic+'»','log-green');dot('manager','busy');ast('manager','st-busy','Активен');mlog('Задача: «'+row.topic+'»');
-
-  var SR=getPrompt('researcher');
-  var SA=getPrompt('analyst');
-  var SC=buildCopyPrompt(row.channels,row.type);
-  var SV=getPrompt('visual');
-  var SFC=getPrompt('factcheck');
-  var SE=getPrompt('editor');
-
-  dot('researcher','busy');ast('researcher','st-busy','Исследует…');showProg('researcher',true);
-  dot('analyst','busy');ast('analyst','st-busy','Анализирует…');showProg('analyst',true);
-  setStreamStart('researcher');setStreamStart('analyst');elog('🔍 Исследователь + 📊 Аналитик…','log-blue');
-  var rRes='',aRes='';
-  try{var p1=await Promise.all([callAIStream(SR,[{role:'user',content:withKb('Исследуй:\n'+brief)}],function(c){appendStream('researcher',c);}),callAIStream(SA,[{role:'user',content:withKb('Подготовь цифры:\n'+brief)}],function(c){appendStream('analyst',c);})]);rRes=p1[0];aRes=p1[1];}
-  catch(e){elog('Ошибка: '+e.message,'log-red');setSt(id,'error');S.running=false;return;}
-  finalizeStream('researcher',rRes,false);showProg('researcher',false);dot('researcher','done');ast('researcher','st-done','Готово ✓');
-  finalizeStream('analyst',aRes,false);showProg('analyst',false);dot('analyst','done');ast('analyst','st-done','Готово ✓');
-  elog('Исследователь и Аналитик завершили','log-green');
-
-  dot('copy','busy');ast('copy','st-busy','Пишет…');showProg('copy',true);
-  dot('visual','busy');ast('visual','st-busy','Думает…');
-  setStreamStart('copy');setStreamStart('visual');elog('✍️ Копирайтер + 🎨 Визуалист…','log-amber');
-  var cRes='',vRes='';
-  try{var enriched=brief+'\n\nИССЛЕДОВАНИЕ:\n'+rRes+'\n\nАНАЛИТИКА:\n'+aRes;var p2=await Promise.all([callAIStream(SC,[{role:'user',content:withKb('Напиши тексты:\n'+enriched)}],function(c){appendStream('copy',c);}),callAIStream(SV,[{role:'user',content:withKb('Концепция:\n'+brief)}],function(c){appendStream('visual',c);})]);cRes=p2[0];vRes=p2[1];}
-  catch(e){elog('Ошибка: '+e.message,'log-red');setSt(id,'error');S.running=false;return;}
-  finalizeStream('copy',cRes,true);showProg('copy',false);dot('copy','done');ast('copy','st-done','Готово ✓');
-  finalizeStream('visual',vRes,false);dot('visual','done');ast('visual','st-done','Готово ✓');
-  elog('Копирайтер и Визуалист завершили','log-green');
-
-  dot('factcheck','busy');ast('factcheck','st-busy','Проверяет…');setStreamStart('factcheck');elog('🔎 Факт-чекер…','log-amber');
-  var fRes='';
-  try{fRes=await callAIStream(SFC,[{role:'user',content:withKb('Проверь:\nБРИФ:\n'+brief+'\n\nТЕКСТ:\n'+cRes)}],function(c){appendStream('factcheck',c);});}catch(e){fRes='Ошибка: '+e.message;}
-  finalizeStream('factcheck',fRes,false);dot('factcheck','done');ast('factcheck','st-done','Готово ✓');elog('Факт-чекер завершил','log-green');
-
-  if(fRes.toLowerCase().indexOf('требует правки')>=0){
-    elog('Факт-чекер: ТРЕБУЕТ ПРАВКИ — исправляю…','log-amber');dot('copy','busy');ast('copy','st-busy','Исправляет…');setStreamStart('copy');
-    try{cRes=await callAIStream(SC,[{role:'user',content:withKb('Исправь по замечаниям факт-чекера.\n\nТЕКСТ:\n'+cRes+'\n\nЗАМЕЧАНИЯ:\n'+fRes)}],function(c){appendStream('copy',c);});finalizeStream('copy',cRes,true);dot('copy','done');ast('copy','st-done','Исправлено ✓');elog('Копирайтер исправил','log-green');}
-    catch(e){elog('Ошибка: '+e.message,'log-red');}
-  }
-
-  var eRes='',ok=false;
-  for(var iter=0;iter<2;iter++){
-    dot('editor','busy');ast('editor','st-busy',iter===0?'Проверяет…':'Повторная проверка…');setStreamStart('editor');elog('Редактор'+(iter>0?' (итер.2)':'')+'…','log-amber');
-    try{eRes=await callAIStream(SE,[{role:'user',content:withKb('Проверь.\nБРИФ:\n'+brief+'\n\nТЕКСТ:\n'+cRes+'\n\nВИЗУАЛ:\n'+vRes)}],function(c){appendStream('editor',c);});}
-    catch(e){elog('Ошибка редактора: '+e.message,'log-red');setSt(id,'error');S.running=false;return;}
-    finalizeStream('editor',eRes,false);dot('editor','done');ast('editor','st-done','Готово ✓');
-    ok=eRes.toLowerCase().indexOf('требует')===-1;if(ok||iter===1)break;
-    elog('Редактор: ТРЕБУЕТ ДОРАБОТКИ…','log-amber');dot('copy','busy');ast('copy','st-busy','Дорабатывает…');setStreamStart('copy');
-    try{cRes=await callAIStream(SC,[{role:'user',content:withKb('Доработай.\n\nТЕКСТ:\n'+cRes+'\n\nЗАМЕЧАНИЯ:\n'+eRes)}],function(c){appendStream('copy',c);});finalizeStream('copy',cRes,true);dot('copy','done');ast('copy','st-done','Доработано ✓');elog('Копирайтер доработал','log-green');}
-    catch(e){elog('Ошибка: '+e.message,'log-red');break;}
-  }
-  document.getElementById('edVerdict').innerHTML='<div class="verdict '+(ok?'verdict-ok':'verdict-warn')+'">'+(ok?'✅ Редактор одобрил':'⚠️ Достигнут лимит итераций')+'</div>';
-  document.getElementById('cp-editor').style.display='inline-flex';
-  row.result={copy:cRes,visual:vRes,editor:eRes,research:rRes,analyst:aRes,factcheck:fRes,approved:false};
-  setSt(id,'review');dot('manager','busy');ast('manager','st-busy','Ждёт согласования');elog('Передаю на согласование…','log-green');mlog('Материалы готовы.');
-  S.running=false;updBadge();autoSave();showAppr(id);
-}
-
+async function runOne(id){var row=S.plan.find(function(r){return r.id===id;});if(!row||S.running)return;S.running=true;document.getElementById('execWrap').style.display='block';renderPlan();var brief='Задача: '+row.topic+'\nТип: '+(TM[row.type]||row.type)+'\nКаналы: '+row.channels.map(function(c){return CM[c];}).join(', ')+'\nДата: '+fmtD(row.date)+(row.notes?'\nПримечания: '+row.notes:'');setSt(id,'inprog');elog('▶ «'+row.topic+'»','log-green');dot('manager','busy');ast('manager','st-busy','Активен');mlog('Задача: «'+row.topic+'»');var SR=getPrompt('researcher');var SA=getPrompt('analyst');var SC=buildCopyPrompt(row.channels,row.type);var SV=getPrompt('visual');var SFC=getPrompt('factcheck');var SE=getPrompt('editor');dot('researcher','busy');ast('researcher','st-busy','Исследует…');showProg('researcher',true);dot('analyst','busy');ast('analyst','st-busy','Анализирует…');showProg('analyst',true);setStreamStart('researcher');setStreamStart('analyst');elog('🔍 Исследователь + 📊 Аналитик…','log-blue');var rRes='',aRes='';try{var p1=await Promise.all([callAIStream(SR,[{role:'user',content:withKb('Исследуй:\n'+brief)}],function(c){appendStream('researcher',c);}),callAIStream(SA,[{role:'user',content:withKb('Подготовь цифры:\n'+brief)}],function(c){appendStream('analyst',c);})]);rRes=p1[0];aRes=p1[1];}catch(e){elog('Ошибка: '+e.message,'log-red');setSt(id,'error');S.running=false;return;}finalizeStream('researcher',rRes,false);showProg('researcher',false);dot('researcher','done');ast('researcher','st-done','Готово ✓');finalizeStream('analyst',aRes,false);showProg('analyst',false);dot('analyst','done');ast('analyst','st-done','Готово ✓');elog('Исследователь и Аналитик завершили','log-green');dot('copy','busy');ast('copy','st-busy','Пишет…');showProg('copy',true);dot('visual','busy');ast('visual','st-busy','Думает…');setStreamStart('copy');setStreamStart('visual');elog('✍️ Копирайтер + 🎨 Визуалист…','log-amber');var cRes='',vRes='';try{var enriched=brief+'\n\nИССЛЕДОВАНИЕ:\n'+rRes+'\n\nАНАЛИТИКА:\n'+aRes;var p2=await Promise.all([callAIStream(SC,[{role:'user',content:withKb('Напиши тексты:\n'+enriched)}],function(c){appendStream('copy',c);}),callAIStream(SV,[{role:'user',content:withKb('Концепция:\n'+brief)}],function(c){appendStream('visual',c);})]);cRes=p2[0];vRes=p2[1];}catch(e){elog('Ошибка: '+e.message,'log-red');setSt(id,'error');S.running=false;return;}finalizeStream('copy',cRes,true);showProg('copy',false);dot('copy','done');ast('copy','st-done','Готово ✓');finalizeStream('visual',vRes,false);dot('visual','done');ast('visual','st-done','Готово ✓');elog('Копирайтер и Визуалист завершили','log-green');dot('factcheck','busy');ast('factcheck','st-busy','Проверяет…');setStreamStart('factcheck');elog('🔎 Факт-чекер…','log-amber');var fRes='';try{fRes=await callAIStream(SFC,[{role:'user',content:withKb('Проверь:\nБРИФ:\n'+brief+'\n\nТЕКСТ:\n'+cRes)}],function(c){appendStream('factcheck',c);});}catch(e){fRes='Ошибка: '+e.message;}finalizeStream('factcheck',fRes,false);dot('factcheck','done');ast('factcheck','st-done','Готово ✓');elog('Факт-чекер завершил','log-green');if(fRes.toLowerCase().indexOf('требует правки')>=0){elog('Факт-чекер: ТРЕБУЕТ ПРАВКИ — исправляю…','log-amber');dot('copy','busy');ast('copy','st-busy','Исправляет…');setStreamStart('copy');try{cRes=await callAIStream(SC,[{role:'user',content:withKb('Исправь по замечаниям факт-чекера.\n\nТЕКСТ:\n'+cRes+'\n\nЗАМЕЧАНИЯ:\n'+fRes)}],function(c){appendStream('copy',c);});finalizeStream('copy',cRes,true);dot('copy','done');ast('copy','st-done','Исправлено ✓');elog('Копирайтер исправил','log-green');}catch(e){elog('Ошибка: '+e.message,'log-red');}}var eRes='',ok=false;for(var iter=0;iter<2;iter++){dot('editor','busy');ast('editor','st-busy',iter===0?'Проверяет…':'Повторная проверка…');setStreamStart('editor');elog('Редактор'+(iter>0?' (итер.2)':'')+'…','log-amber');try{eRes=await callAIStream(SE,[{role:'user',content:withKb('Проверь.\nБРИФ:\n'+brief+'\n\nТЕКСТ:\n'+cRes+'\n\nВИЗУАЛ:\n'+vRes)}],function(c){appendStream('editor',c);});}catch(e){elog('Ошибка редактора: '+e.message,'log-red');setSt(id,'error');S.running=false;return;}finalizeStream('editor',eRes,false);dot('editor','done');ast('editor','st-done','Готово ✓');ok=eRes.toLowerCase().indexOf('требует')===-1;if(ok||iter===1)break;elog('Редактор: ТРЕБУЕТ ДОРАБОТКИ…','log-amber');dot('copy','busy');ast('copy','st-busy','Дорабатывает…');setStreamStart('copy');try{cRes=await callAIStream(SC,[{role:'user',content:withKb('Доработай.\n\nТЕКСТ:\n'+cRes+'\n\nЗАМЕЧАНИЯ:\n'+eRes)}],function(c){appendStream('copy',c);});finalizeStream('copy',cRes,true);dot('copy','done');ast('copy','st-done','Доработано ✓');elog('Копирайтер доработал','log-green');}catch(e){elog('Ошибка: '+e.message,'log-red');break;}}document.getElementById('edVerdict').innerHTML='<div class="verdict '+(ok?'verdict-ok':'verdict-warn')+'">'+(ok?'✅ Редактор одобрил':'⚠️ Достигнут лимит итераций')+'</div>';document.getElementById('cp-editor').style.display='inline-flex';row.result={copy:cRes,visual:vRes,editor:eRes,research:rRes,analyst:aRes,factcheck:fRes,approved:false};setSt(id,'review');dot('manager','busy');ast('manager','st-busy','Ждёт согласования');elog('Передаю на согласование…','log-green');mlog('Материалы готовы.');S.running=false;updBadge();autoSave();showAppr(id);}
 function showAppr(id){var row=S.plan.find(function(r){return r.id===id;});if(!row||!row.result)return;dot('approval','busy');var rev=S.plan.filter(function(r){return r.status==='review';}).length;var nb=document.getElementById('nb-appr');if(nb){nb.textContent=rev;nb.style.display=rev?'inline':'none';}var ch=row.channels.map(function(c){return'<span class="chan c-'+c+'">'+(CM[c]||c)+'</span>';}).join(' ');var imgPrompt='';var pm=row.result.visual.match(/ПРОМПТ:\s*([^\n]+(?:\n(?!ВЕРСТКА:)[^\n]+)*)/i);if(pm)imgPrompt=pm[1].trim();var edOk=row.result.editor.toLowerCase().indexOf('требует')===-1;var factOk=!row.result.factcheck||row.result.factcheck.toLowerCase().indexOf('требует правки')===-1;document.getElementById('apprPage').innerHTML='<div class="appr-wrap"><div class="appr-title">'+esc(row.topic)+'</div><div class="appr-meta">'+ch+' <span>'+fmtD(row.date)+'</span> <span>'+(TM[row.type]||row.type)+'</span></div><div class="appr-checks"><span class="appr-check '+(factOk?'chk-ok':'chk-warn')+'">'+(factOk?'🔎 Факты ОК':'⚠️ Факты: проверить')+'</span><span class="appr-check '+(edOk?'chk-ok':'chk-warn')+'">'+(edOk?'✅ Редактор одобрил':'⚠️ Редактор: замечания')+'</span></div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div class="card-title" style="margin-bottom:0">Превью поста</div><div style="display:flex;gap:6px"><button class="btn btn-default btn-xs" onclick="navigator.clipboard.writeText(document.getElementById(\'pt-'+id+'\').textContent)">Скопировать</button>'+(imgPrompt?'<button class="btn btn-default btn-xs" onclick="cpImgPr('+id+')">Промпт</button>':'')+'</div></div>'+(imgPrompt?'<div style="margin-bottom:12px"><div class="card-title" style="margin-bottom:5px">Промпт для изображения</div><div class="mono-block" id="imgpr-'+id+'">'+esc(imgPrompt)+'</div></div>':'')+'<div class="tg-preview"><div id="imgzone-'+id+'" class="tg-img-zone"><div id="nophoto-'+id+'" style="text-align:center;padding:16px"><div style="font-size:12px;font-weight:500;color:var(--accent);margin-bottom:8px">Добавить фото</div><button onclick="document.getElementById(\'imgf-'+id+'\').click()" style="background:var(--accent);color:#fff;border:none;padding:7px 16px;border-radius:var(--rs);font-size:11px;font-weight:500;cursor:pointer;font-family:inherit">📎 Загрузить</button></div><img id="previmg-'+id+'" style="display:none;width:100%;max-height:240px;object-fit:cover" src=""></div><div class="tg-body"><div id="pt-'+id+'" class="tg-text">'+esc(row.result.copy)+'</div><div class="tg-sender"><div class="tg-sender-dot">★</div><span class="tg-sender-name">СберПремьер</span></div></div></div><input type="file" id="imgf-'+id+'" accept="image/*" style="display:none" onchange="handleImg('+id+',this)"><details style="margin:12px 0 6px"><summary>Данные исследователя и аналитика</summary><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><div style="background:rgba(33,160,56,.05);border:1px solid rgba(33,160,56,.12);border-radius:var(--rs);padding:11px;font-size:11px;line-height:1.55;white-space:pre-wrap;color:var(--t2)">'+esc(row.result.research||'—')+'</div><div style="background:rgba(200,136,10,.05);border:1px solid rgba(200,136,10,.12);border-radius:var(--rs);padding:11px;font-size:11px;line-height:1.55;white-space:pre-wrap;color:var(--t2)">'+esc(row.result.analyst||'—')+'</div></div></details><details style="margin-bottom:14px"><summary>Заключения редактора и факт-чекера</summary><div style="background:var(--surf2);border:1px solid var(--brd);border-radius:var(--rs);padding:11px 13px;font-size:11px;line-height:1.65;color:var(--t2);white-space:pre-wrap;margin-top:8px">'+esc(row.result.editor)+'</div><div style="background:var(--surf2);border:1px solid var(--brd);border-radius:var(--rs);padding:11px 13px;font-size:11px;line-height:1.65;color:var(--t2);white-space:pre-wrap;margin-top:7px">'+esc(row.result.factcheck||'—')+'</div></details><div class="appr-actions"><button class="btn-approve" onclick="approveTask('+id+')">✅ Одобрить</button><button class="btn-rework" onclick="togRework('+id+')">✏️ На доработку</button></div><div class="rework-box" id="rwbox-'+id+'"><label class="form-label">Опиши что исправить:</label><textarea id="rwnotes-'+id+'" rows="3" placeholder="Сделай тон живее…" style="margin-bottom:8px"></textarea><button class="btn btn-default btn-sm" onclick="sendRework('+id+')">Отправить на доработку</button></div></div>';goPage('approval',document.getElementById('nav-approval'));}
 function togRework(id){var el=document.getElementById('rwbox-'+id);if(el)el.style.display=el.style.display==='block'?'none':'block';}
 function cpImgPr(id){var el=document.getElementById('imgpr-'+id);if(el)navigator.clipboard.writeText(el.textContent);}
@@ -802,7 +926,6 @@ function elog(msg,cls){var el=document.getElementById('execLog'),t=new Date().to
 function mlog(msg){var el=document.getElementById('managerLog'),t=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});var d=document.createElement('div');d.className='log-line';d.innerHTML='<span class="log-time">'+t+'</span><span class="log-msg">'+msg+'</span>';el.appendChild(d);el.scrollTop=el.scrollHeight;}
 async function callAI(sys,user,retries){if(!S.apiKey)throw new Error('API ключ не введён');retries=retries||0;var r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:MDL,max_tokens:2000,system:sys,messages:[{role:'user',content:user}]})});if(r.status===429){if(retries<3){var w=Math.pow(2,retries+1)*1000;elog('⏳ Rate limit, жду '+Math.round(w/1000)+'с…','log-amber');await new Promise(function(res){setTimeout(res,w);});return callAI(sys,user,retries+1);}throw new Error('Rate limit.');}if(!r.ok){var t=await r.text();throw new Error('HTTP '+r.status+': '+t.slice(0,150));}var d=await r.json();if(d.error)throw new Error(d.error.message);return(d.content&&d.content[0]&&d.content[0].text)?d.content[0].text:'';}
 async function callAIStream(sys,messages,onChunk,retries){if(!S.apiKey)throw new Error('API ключ не введён');retries=retries||0;var r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:MDL,max_tokens:2000,stream:true,system:sys,messages:messages})});if(r.status===429){if(retries<3){var w=Math.pow(2,retries+1)*1000;elog('⏳ Rate limit…','log-amber');await new Promise(function(res){setTimeout(res,w);});return callAIStream(sys,messages,onChunk,retries+1);}throw new Error('Rate limit.');}if(!r.ok){var t=await r.text();throw new Error('HTTP '+r.status+': '+t.slice(0,150));}var reader=r.body.getReader();var dec=new TextDecoder();var full='';var buf='';while(true){var res=await reader.read();if(res.done)break;buf+=dec.decode(res.value,{stream:true});var lines=buf.split('\n');buf=lines.pop();for(var i=0;i<lines.length;i++){var line=lines[i].trim();if(!line||!line.startsWith('data:'))continue;var data=line.slice(5).trim();if(data==='[DONE]')continue;try{var ev=JSON.parse(data);if(ev.type==='content_block_delta'&&ev.delta&&ev.delta.type==='text_delta'){var chunk=ev.delta.text||'';full+=chunk;if(onChunk)onChunk(chunk);}}catch(e){}}}return full;}
-
 document.getElementById('m-date').value=toDay();
 loadPrompts();
 lsLoad();
